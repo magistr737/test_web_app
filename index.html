@@ -112,13 +112,7 @@
         } else {
             const user = initData.user;
             
-            contentDiv.innerHTML = `
-                // <div class="user-info">
-                //     <h2>Информация о пользователе</h2>
-                //     <p><strong>Имя:</strong> ${user.first_name}</p>
-                //     <pre>Full data: ${user}</pre>
-                // </div>
-                
+            contentDiv.innerHTML = `                
                 <div class="form-group">
                     <label for="nameInput">Введите ваше имя:</label>
                     <input type="text" id="nameInput" placeholder="Ваше имя" maxlength="32">
