@@ -42,6 +42,11 @@
         <div class="info-item"><strong>Язык:</strong> <span id="language"></span></div>
         <div class="info-item"><strong>Тема:</strong> <span id="theme"></span></div>
     </div>
+
+    <h2>Полные данные InitData:</h2>
+    <div class="info-block">
+        <pre id="initData" style="white-space: pre-wrap; word-wrap: break-word;"></pre>
+    </div>
     
     <button class="close-btn" id="closeBtn">Закрыть</button>
 
@@ -60,6 +65,7 @@
             document.getElementById('firstName').textContent = user.first_name || 'не указано';
             document.getElementById('lastName').textContent = user.last_name || 'не указано';
             document.getElementById('language').textContent = user.language_code || 'не указан';
+            document.getElementById('initData').textContent = JSON.stringify(tg.initDataUnsafe, null, 2);
         }
         
         // Применяем тему
