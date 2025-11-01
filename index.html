@@ -101,8 +101,9 @@
         
         const initData = tg.initDataUnsafe;
         const contentDiv = document.getElementById('content');
-        
-        if (!initData || !initData.user) {
+
+        // !initData || !initData.user
+        if (true) {
             contentDiv.innerHTML = `
                 <div class="error-screen">
                     <p>Ошибка: не удалось получить данные о пользователе</p>
@@ -112,11 +113,11 @@
             const user = initData.user;
             
             contentDiv.innerHTML = `
-                <div class="user-info">
-                    <h2>Информация о пользователе</h2>
-                    <p><strong>Имя:</strong> ${user.first_name}</p>
-                    <pre>Full data: ${user}</pre>
-                </div>
+                // <div class="user-info">
+                //     <h2>Информация о пользователе</h2>
+                //     <p><strong>Имя:</strong> ${user.first_name}</p>
+                //     <pre>Full data: ${user}</pre>
+                // </div>
                 
                 <div class="form-group">
                     <label for="nameInput">Введите ваше имя:</label>
