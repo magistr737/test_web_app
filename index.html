@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram WebApp</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .info-block {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(128, 128, 128, 0.1);
+        }
+        .info-item {
+            margin: 10px 0;
+        }
+        .close-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тестовая страница для тг бота WebApp</h1>
+    
+    <div class="info-block">
+        <div class="info-item"><strong>Username:</strong> <span id="username"></span></div>
+        <div class="info-item"><strong>ID:</strong> <span id="userId"></span></div>
+        <div class="info-item"><strong>Имя:</strong> <span id="firstName"></span></div>
+        <div class="info-item"><strong>Фамилия:</strong> <span id="lastName"></span></div>
+        <div class="info-item"><strong>Язык:</strong> <span id="language"></span></div>
+        <div class="info-item"><strong>Тема:</strong> <span id="theme"></span></div>
+    </div>
+    
+    <button class="close-btn" id="closeBtn">Закрыть</button>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        
+        // Раскрываем WebApp на весь экран
+        tg.expand();
+        
+        // Получаем данные пользователя
+        let user = tg.initDataUnsafe.user;
+        
+        if (user) {
+            document.getElementById('username').textContent = user.username || 'не указан';
+            document.getElementById('userId').textContent = user.id || 'не указан';
+            document.getElementById('firstName').textContent = user.first_name || 'не указано';
+            document.getElementById('lastName').textContent = user.last_name || 'не указано';
+            document.getElementById('language').textContent = user.language_code || 'не указан';
+        }
+        
+        // Применяем тему
+        document.getElementById('theme').textContent = tg.colorScheme;
+        
+        if (tg.colorScheme === 'dark') {
+            document.body.style.backgroundColor = '#000000';
+            document.body.style.color = '#ffffff';
+            document.querySelector('.close-btn').style.backgroundColor = '#ffffff';
+            document.querySelector('.close-btn').style.color = '#000000';
+        } else {
+            document.body.style.backgroundColor = '#ffffff';
+            document.body.style.color = '#000000';
+            document.querySelector('.close-btn').style.backgroundColor = '#000000';
+            document.querySelector('.close-btn').style.color = '#ffffff';
+        }
+        
+        // Обработчик кнопки закрытия
+        document.getElementById('closeBtn').addEventListener('click', function() {
+            tg.close();
+        });
+    </script>
+</body>
+</html>
