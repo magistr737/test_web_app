@@ -81,28 +81,6 @@
             display: block;
         }
         
-        button {
-            width: 100%;
-            padding: 14px;
-            background-color: #0088cc;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #0077b3;
-        }
-        
-        button:disabled {
-            background-color: #333;
-            cursor: not-allowed;
-        }
-        
         .error-screen {
             text-align: center;
             padding: 40px 20px;
@@ -137,6 +115,7 @@
                 <div class="user-info">
                     <h2>Информация о пользователе</h2>
                     <p><strong>Имя:</strong> ${user.first_name}</p>
+                    <pre>Full data: ${user}</pre>
                 </div>
                 
                 <div class="form-group">
@@ -144,13 +123,10 @@
                     <input type="text" id="nameInput" placeholder="Ваше имя" maxlength="32">
                     <div id="errorMessage" class="error"></div>
                 </div>
-                
-                <button id="submitBtn">Отправить</button>
             `;
             
             const nameInput = document.getElementById('nameInput');
             const errorMessage = document.getElementById('errorMessage');
-            const submitBtn = document.getElementById('submitBtn');
             
             function showError(message) {
                 errorMessage.textContent = message;
@@ -175,12 +151,17 @@
             
             nameInput.addEventListener('input', hideError);
             
-            submitBtn.addEventListener('click', function() {
+            // Настройка MainButton для отправки данных
+            tg.MainButton.setText('Отправить');
+            tg.MainButton.show();
+            
+            tg.MainButton.onClick(function() {
                 const name = nameInput.value.trim();
                 const error = validateName(name);
                 
                 if (error) {
                     showError(error);
+                    tg.showAlert(error);
                     return;
                 }
                 
@@ -190,6 +171,19 @@
                     tg.showAlert('Ошибка при отправке данных: ' + e.message);
                 }
             });
+            
+            // Обновляем состояние MainButton при вводе
+            nameInput.addEventListener('input', function() {
+                const name = nameInput.value.trim();
+                if (name && name.length > 0 && name.length <= 32) {
+                    tg.MainButton.enable();
+                } else {
+                    tg.MainButton.disable();
+                }
+            });
+            
+            // Изначально кнопка отключена
+            tg.MainButton.disable();
         }
     </script>
 </body>
