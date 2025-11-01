@@ -53,11 +53,10 @@
     <script>
         let tg = window.Telegram.WebApp;
 
-        if (typeof window.Telegram === 'undefined' || 
-            typeof window.Telegram.WebApp === 'undefined' || 
-            window.Telegram.WebApp.platform === 'unknown') {
-            document.body.innerHTML = '<div style="text-align: center; padding: 50px;"><h1>❌ Ошибка доступа</h1><p>Этот сайт доступен только через Telegram WebApp</p></div>';
-            return;
+        if (!tg.initData || tg.initData === '') {
+            document.body.innerHTML = '';
+            document.body.style.display = 'none';
+            throw new Error('This page can only be opened in Telegram WebApp');
         }
         
         // Раскрываем WebApp на весь экран
