@@ -117,8 +117,14 @@
             }
             
             errorMsg.style.display = 'none';
-            tg.sendData(JSON.stringify({ name: name }));
-            tg.close();
+            
+            // ВАЖНО: Используем MainButton для отправки данных
+            tg.MainButton.setText('Отправка...');
+            tg.MainButton.show();
+            tg.MainButton.onClick(function() {
+                tg.sendData(JSON.stringify({ name: name }));
+            });
+            tg.MainButton.click();
         }
         
         document.getElementById('submitBtn').addEventListener('click', submitName);
