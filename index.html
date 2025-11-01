@@ -53,7 +53,9 @@
     <script>
         let tg = window.Telegram.WebApp;
 
-        if (!window.Telegram || !window.Telegram.WebApp || !tg.initDataUnsafe || !tg.initDataUnsafe.user) {
+        if (typeof window.Telegram === 'undefined' || 
+            typeof window.Telegram.WebApp === 'undefined' || 
+            window.Telegram.WebApp.platform === 'unknown') {
             document.body.innerHTML = '<div style="text-align: center; padding: 50px;"><h1>❌ Ошибка доступа</h1><p>Этот сайт доступен только через Telegram WebApp</p></div>';
             return;
         }
