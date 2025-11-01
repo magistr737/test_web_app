@@ -3,164 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram WebApp</title>
+    <title>WebApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+        * {
             margin: 0;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .info-block {
-            margin: 20px 0;
-            padding: 15px;
-            border-radius: 8px;
-            background: rgba(128, 128, 128, 0.1);
-        }
-        .info-item {
-            margin: 10px 0;
-        }
-        .close-btn {
-            padding: 12px 24px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
-            margin-right: 10px;
-        }
-        #nameInput {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 8px;
+            padding: 0;
             box-sizing: border-box;
-            margin-top: 10px;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .user-info {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #1a1a1a;
+            border-radius: 12px;
+        }
+        
+        .user-info h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .user-info p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            background-color: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #0088cc;
+        }
+        
+        .error {
+            color: #ff3b30;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #0088cc;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0077b3;
+        }
+        
+        button:disabled {
+            background-color: #333;
+            cursor: not-allowed;
+        }
+        
+        .error-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .error-screen p {
+            font-size: 18px;
+            color: #ff3b30;
         }
     </style>
 </head>
 <body>
-    <h1>Тестовая страница для тг бота WebApp</h1>
-    
-    <div class="info-block">
-        <div class="info-item"><strong>Username:</strong> <span id="username"></span></div>
-        <div class="info-item"><strong>ID:</strong> <span id="userId"></span></div>
-        <div class="info-item"><strong>Имя:</strong> <span id="firstName"></span></div>
-        <div class="info-item"><strong>Фамилия:</strong> <span id="lastName"></span></div>
-        <div class="info-item"><strong>Язык:</strong> <span id="language"></span></div>
-        <div class="info-item"><strong>Тема:</strong> <span id="theme"></span></div>
-    </div>
-
-    <h2>Полные данные InitData:</h2>
-    <div class="info-block">
-        <pre id="initData" style="white-space: pre-wrap; word-wrap: break-word;"></pre>
-    </div>
-
-    <h2>Введите ваше имя:</h2>
-    <div class="info-block">
-        <input type="text" id="nameInput" placeholder="Введите имя">
-    </div>
-    
-    <button class="close-btn" id="sendBtn">Отправить имя</button>
-    <button class="close-btn" id="closeBtn">Закрыть</button>
+    <div class="container" id="content"></div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        
-        // Проверка
-        console.log('Telegram WebApp:', tg);
-        console.log('InitData:', tg.initData);
-        console.log('User:', tg.initDataUnsafe.user);
-        
-        if (!tg.initData || tg.initData === '') {
-            alert('Эта страница должна открываться через Telegram Bot!');
-            console.error('No initData found');
-        }
-        
+        const tg = window.Telegram.WebApp;
         tg.expand();
         
-        let user = tg.initDataUnsafe.user;
+        const initData = tg.initDataUnsafe;
+        const contentDiv = document.getElementById('content');
         
-        // Заполняем данные
-        if (user) {
-            document.getElementById('username').textContent = user.username || 'не указан';
-            document.getElementById('userId').textContent = user.id || 'не указан';
-            document.getElementById('firstName').textContent = user.first_name || 'не указано';
-            document.getElementById('lastName').textContent = user.last_name || 'не указано';
-            document.getElementById('language').textContent = user.language_code || 'не указан';
-            document.getElementById('initData').textContent = JSON.stringify(tg.initDataUnsafe, null, 2);
-        }
-        
-        document.getElementById('theme').textContent = tg.colorScheme;
-        
-        // Применяем тему
-        if (tg.colorScheme === 'dark') {
-            document.body.style.backgroundColor = '#000000';
-            document.body.style.color = '#ffffff';
-            document.querySelectorAll('.close-btn').forEach(btn => {
-                btn.style.backgroundColor = '#ffffff';
-                btn.style.color = '#000000';
-            });
-            document.getElementById('nameInput').style.backgroundColor = '#333333';
-            document.getElementById('nameInput').style.color = '#ffffff';
-            document.getElementById('nameInput').style.border = '1px solid #555555';
+        if (!initData || !initData.user) {
+            contentDiv.innerHTML = `
+                <div class="error-screen">
+                    <p>Ошибка: не удалось получить данные о пользователе</p>
+                </div>
+            `;
         } else {
-            document.body.style.backgroundColor = '#ffffff';
-            document.body.style.color = '#000000';
-            document.querySelectorAll('.close-btn').forEach(btn => {
-                btn.style.backgroundColor = '#000000';
-                btn.style.color = '#ffffff';
-            });
-            document.getElementById('nameInput').style.border = '1px solid #cccccc';
-        }
-        
-        // Настройка MainButton
-        tg.MainButton.setText("Отправить имя");
-        tg.MainButton.color = "#2481cc";
-        tg.MainButton.hide();
-        
-        // Отслеживание ввода
-        document.getElementById('nameInput').addEventListener('input', function() {
-            if (this.value.trim().length > 0) {
-                tg.MainButton.show();
-            } else {
-                tg.MainButton.hide();
-            }
-        });
-        
-        // Функция отправки
-        function sendName() {
-            let name = document.getElementById('nameInput').value.trim();
+            const user = initData.user;
             
-            if (!name) {
-                tg.showAlert('Введите имя!');
-                return;
+            contentDiv.innerHTML = `
+                <div class="user-info">
+                    <h2>Информация о пользователе</h2>
+                    <p><strong>Имя:</strong> ${user.first_name}</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nameInput">Введите ваше имя:</label>
+                    <input type="text" id="nameInput" placeholder="Ваше имя" maxlength="32">
+                    <div id="errorMessage" class="error"></div>
+                </div>
+                
+                <button id="submitBtn">Отправить</button>
+            `;
+            
+            const nameInput = document.getElementById('nameInput');
+            const errorMessage = document.getElementById('errorMessage');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.add('show');
             }
             
-            console.log('Отправка данных:', name);
+            function hideError() {
+                errorMessage.classList.remove('show');
+            }
             
-            let data = JSON.stringify({
-                action: 'set_name',
-                name: name,
-                user_id: user ? user.id : null
+            function validateName(name) {
+                if (!name || name.trim() === '') {
+                    return 'Имя не может быть пустым';
+                }
+                
+                if (name.length > 32) {
+                    return 'Имя не может быть длиннее 32 символов';
+                }
+                
+                return null;
+            }
+            
+            nameInput.addEventListener('input', hideError);
+            
+            submitBtn.addEventListener('click', function() {
+                const name = nameInput.value.trim();
+                const error = validateName(name);
+                
+                if (error) {
+                    showError(error);
+                    return;
+                }
+                
+                try {
+                    tg.sendData(JSON.stringify({ name: name }));
+                } catch (e) {
+                    tg.showAlert('Ошибка при отправке данных: ' + e.message);
+                }
             });
-            
-            console.log('JSON данные:', data);
-            
-            tg.sendData(data);
         }
-        
-        // MainButton клик
-        tg.MainButton.onClick(sendName);
-        
-        // Обычная кнопка
-        document.getElementById('sendBtn').addEventListener('click', sendName);
-        
-        // Кнопка закрытия
-        document.getElementById('closeBtn').addEventListener('click', function() {
-            tg.close();
-        });
     </script>
 </body>
 </html>
