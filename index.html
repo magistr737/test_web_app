@@ -29,6 +29,14 @@
             cursor: pointer;
             margin-top: 20px;
         }
+        #nameInput {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -49,24 +57,17 @@
     </div>
 
     <div class="info-block">
-        <label for="nameInput"><strong>Введите ваше имя:</strong></label>
-        <input 
-            type="text" 
-            id="nameInput" 
-            maxlength="32" 
-            placeholder="Введите имя (до 32 символов)"
-            style="width: 100%; padding: 10px; margin-top: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;"
-        >
-        <div id="errorMsg" style="color: red; margin-top: 5px; display: none;">Имя не может быть пустым</div>
+        <h2>Введите ваше имя</h2>
+        <input type="text" id="nameInput" placeholder="Введите имя (до 32 символов)" maxlength="32">
+        <div id="errorMessage" style="color: red; margin-top: 10px; display: none;"></div>
+        <button class="close-btn" id="sendBtn">Отправить</button>
     </div>
-
-<button class="close-btn" id="submitBtn">Отправить</button>
     
     <button class="close-btn" id="closeBtn">Закрыть</button>
 
     <script>
         let tg = window.Telegram.WebApp;
-
+    
         if (!tg.initData || tg.initData === '') {
             document.body.innerHTML = '';
             document.body.style.display = 'none';
@@ -97,6 +98,7 @@
             });
             document.getElementById('nameInput').style.backgroundColor = '#333333';
             document.getElementById('nameInput').style.color = '#ffffff';
+            document.getElementById('nameInput').style.border = '1px solid #555555';
         } else {
             document.body.style.backgroundColor = '#ffffff';
             document.body.style.color = '#000000';
@@ -104,39 +106,37 @@
                 btn.style.backgroundColor = '#000000';
                 btn.style.color = '#ffffff';
             });
+            document.getElementById('nameInput').style.border = '1px solid #cccccc';
         }
-        
-        function submitName() {
-            const nameInput = document.getElementById('nameInput');
-            const errorMsg = document.getElementById('errorMsg');
-            const name = nameInput.value.trim();
-            
-            if (name === '' || name.length === 0) {
-                errorMsg.style.display = 'block';
-                return;
-            }
-            
-            errorMsg.style.display = 'none';
-            
-            // ВАЖНО: Используем MainButton для отправки данных
-            tg.MainButton.setText('Отправка...');
-            tg.MainButton.show();
-            tg.MainButton.onClick(function() {
-                tg.sendData(JSON.stringify({ name: name }));
-            });
-            tg.MainButton.click();
-        }
-        
-        document.getElementById('submitBtn').addEventListener('click', submitName);
-        
-        document.getElementById('nameInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                submitName();
-            }
-        });
         
         document.getElementById('closeBtn').addEventListener('click', function() {
             tg.close();
+        });
+    
+        document.getElementById('sendBtn').addEventListener('click', function() {
+            const nameInput = document.getElementById('nameInput');
+            const errorMessage = document.getElementById('errorMessage');
+            const name = nameInput.value.trim();
+            
+            // Проверка на пустоту
+            if (name === '') {
+                errorMessage.textContent = 'Ошибка: имя не может быть пустым';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Проверка на длину
+            if (name.length > 32) {
+                errorMessage.textContent = 'Ошибка: имя не может быть длиннее 32 символов';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Скрываем ошибку если всё ок
+            errorMessage.style.display = 'none';
+            
+            // Отправляем данные боту
+            tg.sendData(JSON.stringify({ name: name }));
         });
     </script>
 </body>
