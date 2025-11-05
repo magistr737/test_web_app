@@ -3,374 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Web App</title>
+    <title>Персонажи</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            transition: background-color 0.3s, color 0.3s;
-            padding: 20px;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 20px;
         }
 
-        body.dark {
-            background-color: #000000;
+        .filter-buttons {
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            background-color: #0a0a0a;
+            z-index: 100;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .filter-btn {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #2a2a2a;
+            padding: 8px 16px;
+            margin: 4px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background-color: #2a2a2a;
+            border-color: #3a3a3a;
+        }
+
+        .filter-btn.active {
+            background-color: #0088cc;
+            border-color: #0088cc;
             color: #ffffff;
         }
 
-        body.light {
-            background-color: #ffffff;
-            color: #000000;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 50vh;
-        }
-
-        .loading-text {
-            font-size: 20px;
-            margin-top: 20px;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(128, 128, 128, 0.3);
-            border-top-color: #0088cc;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .content {
-            display: none;
-        }
-
-        .content.show {
-            display: block;
-        }
-
-        .data-block {
-            border: 1px solid;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        body.dark .data-block {
-            border-color: #333333;
+        .character-card {
             background-color: #1a1a1a;
-        }
-
-        body.light .data-block {
-            border-color: #e0e0e0;
-            background-color: #f5f5f5;
-        }
-
-        .data-title {
-            font-size: 18px;
-            font-weight: 600;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
             margin-bottom: 15px;
         }
 
-        .data-item {
-            margin-bottom: 12px;
-            padding: 8px 0;
-            border-bottom: 1px solid;
+        .character-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 136, 204, 0.3);
         }
 
-        body.dark .data-item {
-            border-bottom-color: #2a2a2a;
-        }
-
-        body.light .data-item {
-            border-bottom-color: #e8e8e8;
-        }
-
-        .data-item:last-child {
-            border-bottom: none;
-        }
-
-        .data-label {
-            font-weight: 600;
-            margin-bottom: 4px;
-            font-size: 14px;
-            opacity: 0.7;
-        }
-
-        .data-value {
-            font-size: 16px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .badge-true {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .badge-false {
-            background-color: #f44336;
-            color: white;
-        }
-
-        .close-button {
+        .character-card img {
             width: 100%;
-            padding: 14px;
-            background-color: #0088cc;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .character-card .card-body {
+            padding: 15px;
+        }
+
+        .character-card .card-title {
+            font-size: 18px;
             font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            margin-bottom: 8px;
+            color: #ffffff;
         }
 
-        .close-button:hover {
-            background-color: #0077b3;
+        .character-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-right: 5px;
+            margin-bottom: 5px;
         }
 
-        .close-button:active {
-            background-color: #006699;
+        .badge-started {
+            background-color: #28a745;
         }
 
-        .error {
-            color: #f44336;
-            padding: 20px;
-            text-align: center;
-            font-size: 16px;
+        .badge-created {
+            background-color: #6f42c1;
+        }
+
+        .badge-imported {
+            background-color: #fd7e14;
+        }
+
+        .header-title {
+            padding: 20px 15px 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 576px) {
+            .character-card img {
+                height: 180px;
+            }
+            
+            .filter-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <div class="loading-text">Loading...........</div>
+    <div class="container-fluid">
+        <div class="header-title">
+            🎭 Мои Персонажи
         </div>
 
-        <div class="content" id="content">
-            <div class="data-block">
-                <div class="data-title">Полученные данные из API</div>
-                
-                <div class="data-item">
-                    <div class="data-label">Telegram ID</div>
-                    <div class="data-value" id="userId"></div>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">Все</button>
+            <button class="filter-btn" data-filter="favorite">⭐ Избранные</button>
+            <button class="filter-btn" data-filter="started">💬 Начатые</button>
+            <button class="filter-btn" data-filter="created">✨ Созданные</button>
+            <button class="filter-btn" data-filter="imported">📥 Импорт</button>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <!-- Персонаж 1 -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="character-card">
+                        <img src="https://via.placeholder.com/300x200/1a1a1a/0088cc?text=Character+1" alt="Character">
+                        <div class="card-body">
+                            <h5 class="card-title">Алиса</h5>
+                            <div>
+                                <span class="character-badge badge-started">💬 Начато</span>
+                                <span class="character-badge badge-created">✨ Создан</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="data-item">
-                    <div class="data-label">Имя</div>
-                    <div class="data-value" id="firstName"></div>
+                <!-- Персонаж 2 -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="character-card">
+                        <img src="https://via.placeholder.com/300x200/1a1a1a/28a745?text=Character+2" alt="Character">
+                        <div class="card-body">
+                            <h5 class="card-title">Максим</h5>
+                            <div>
+                                <span class="character-badge badge-imported">📥 Импорт</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="data-item">
-                    <div class="data-label">Фамилия</div>
-                    <div class="data-value" id="lastName"></div>
+                <!-- Персонаж 3 -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="character-card">
+                        <img src="https://via.placeholder.com/300x200/1a1a1a/6f42c1?text=Character+3" alt="Character">
+                        <div class="card-body">
+                            <h5 class="card-title">София</h5>
+                            <div>
+                                <span class="character-badge badge-started">💬 Начато</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="data-item">
-                    <div class="data-label">Username</div>
-                    <div class="data-value" id="username"></div>
+                <!-- Персонаж 4 -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="character-card">
+                        <img src="https://via.placeholder.com/300x200/1a1a1a/fd7e14?text=Character+4" alt="Character">
+                        <div class="card-body">
+                            <h5 class="card-title">Дмитрий</h5>
+                            <div>
+                                <span class="character-badge badge-created">✨ Создан</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="data-item">
-                    <div class="data-label">Код языка</div>
-                    <div class="data-value" id="languageCode"></div>
+                <!-- Персонаж 5 -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="character-card">
+                        <img src="https://via.placeholder.com/300x200/1a1a1a/dc3545?text=Character+5" alt="Character">
+                        <div class="card-body">
+                            <h5 class="card-title">Екатерина</h5>
+                            <div>
+                                <span class="character-badge badge-imported">📥 Импорт</span>
+                                <span class="character-badge badge-started">💬 Начато</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="data-item">
-                    <div class="data-label">Реферер</div>
-                    <div class="data-value" id="referrer"></div>
-                </div>
-
-                <div class="data-item">
-                    <div class="data-label">Дата регистрации</div>
-                    <div class="data-value" id="createdAt"></div>
-                </div>
-
-                <div class="data-item">
-                    <div class="data-label">Администратор</div>
-                    <div class="data-value" id="isAdmin"></div>
-                </div>
-
-                <div class="data-item">
-                    <div class="data-label">Подозрительный</div>
-                    <div class="data-value" id="isSuspicious"></div>
-                </div>
-
-                <div class="data-item">
-                    <div class="data-label">Заблокирован</div>
-                    <div class="data-value" id="isBlock"></div>
-                </div>
-
-                <div class="data-item">
-                    <div class="data-label">Telegram Premium</div>
-                    <div class="data-value" id="isPremium"></div>
+                <!-- Персонаж 6 -->
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="character-card">
+                        <img src="https://via.placeholder.com/300x200/1a1a1a/17a2b8?text=Character+6" alt="Character">
+                        <div class="card-body">
+                            <h5 class="card-title">Андрей</h5>
+                            <div>
+                                <span class="character-badge badge-created">✨ Создан</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <button class="close-button" id="closeButton">Закрыть</button>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz4YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script>
-        const tg = window.Telegram.WebApp;
-        
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        tg.expand();
 
-        // Показываем информацию сразу при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                tg.expand();
-                
-                // Применяем тему
-                function applyTheme() {
-                    if (tg.colorScheme === 'dark') {
-                        document.body.classList.add('dark');
-                        document.body.classList.remove('light');
-                    } else {
-                        document.body.classList.add('light');
-                        document.body.classList.remove('dark');
-                    }
-                }
-
-                applyTheme();
-
-                // Функция для форматирования даты
-                function formatDate(dateString) {
-                    const date = new Date(dateString);
-                    return date.toLocaleString('ru-RU');
-                }
-
-                // Функция для создания badge
-                function createBadge(value) {
-                    return `<span class="status-badge ${value ? 'badge-true' : 'badge-false'}">${value ? 'Да' : 'Нет'}</span>`;
-                }
-
-                // Загружаем данные
-                async function loadUserData() {
-                    try {
-                        const initData = tg.initData;
-                        const initDataUnsafe = tg.initDataUnsafe;
-                        
-                        // Показываем отладочную информацию
-                        if (!initData || initData === '') {
-                            document.getElementById('loading').innerHTML = `
-                                <div class="error">
-                                    <h3>Отладочная информация:</h3>
-                                    <p><strong>initData:</strong> ${initData || 'пусто/undefined'}</p>
-                                    <p><strong>initData type:</strong> ${typeof initData}</p>
-                                    <p><strong>initData length:</strong> ${initData ? initData.length : 0}</p>
-                                    <p><strong>WebApp version:</strong> ${tg.version || 'не определена'}</p>
-                                    <p><strong>Platform:</strong> ${tg.platform || 'не определена'}</p>
-                                    <p><strong>User ID:</strong> ${initDataUnsafe?.user?.id || 'нет'}</p>
-                                    <p><strong>User name:</strong> ${initDataUnsafe?.user?.first_name || 'нет'}</p>
-                                    <p><strong>Is Expanded:</strong> ${tg.isExpanded}</p>
-                                    <p><strong>window.Telegram:</strong> ${typeof window.Telegram}</p>
-                                    <br>
-                                    <p style="color: #ff9800;">WebApp должен быть открыт через inline кнопку в Telegram</p>
-                                </div>
-                            `;
-                            return;
-                        }
-
-                        const response = await fetch('https://testapi.capyhub.su/v1/user/me', {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-Telegram-Init-Data': initData
-                            },
-                            credentials: 'omit'
-                        });
-
-                        if (!response.ok) {
-                            const errorText = await response.text();
-                            document.getElementById('loading').innerHTML = `
-                                <div class="error">
-                                    <h3>Ошибка API:</h3>
-                                    <p><strong>Status:</strong> ${response.status}</p>
-                                    <p><strong>Message:</strong> ${errorText}</p>
-                                    <br>
-                                    <p><strong>initData length:</strong> ${initData.length} символов</p>
-                                    <p><strong>initData начало:</strong> ${initData.substring(0, 100)}...</p>
-                                </div>
-                            `;
-                            return;
-                        }
-
-                        const data = await response.json();
-
-                        // Заполняем данные
-                        document.getElementById('userId').textContent = data.id;
-                        document.getElementById('firstName').textContent = data.first_name;
-                        document.getElementById('lastName').textContent = data.last_name || 'Не указана';
-                        document.getElementById('username').textContent = data.username ? '@' + data.username : 'Не указан';
-                        document.getElementById('languageCode').textContent = data.language_code || 'Не указан';
-                        document.getElementById('referrer').textContent = data.referrer || 'Нет';
-                        document.getElementById('createdAt').textContent = formatDate(data.created_at);
-                        document.getElementById('isAdmin').innerHTML = createBadge(data.is_admin);
-                        document.getElementById('isSuspicious').innerHTML = createBadge(data.is_suspicious);
-                        document.getElementById('isBlock').innerHTML = createBadge(data.is_block);
-                        document.getElementById('isPremium').innerHTML = createBadge(data.is_premium);
-
-                        // Показываем контент
-                        document.getElementById('loading').style.display = 'none';
-                        document.getElementById('content').classList.add('show');
-
-                    } catch (error) {
-                        document.getElementById('loading').innerHTML = `
-                            <div class="error">
-                                <h3>Ошибка:</h3>
-                                <p><strong>Message:</strong> ${error.message}</p>
-                                <p><strong>Stack:</strong> ${error.stack}</p>
-                                <br>
-                                <p><strong>Telegram WebApp:</strong> ${typeof tg}</p>
-                                <p><strong>initData доступен:</strong> ${typeof tg.initData}</p>
-                            </div>
-                        `;
-                    }
-                }
-
-                // Кнопка закрыть
-                document.getElementById('closeButton').addEventListener('click', () => {
-                    tg.close();
-                });
-
-                // Загружаем данные при старте
-                loadUserData();
-                
-            } catch (globalError) {
-                document.getElementById('loading').innerHTML = `
-                    <div class="error">
-                        <h3>Глобальная ошибка:</h3>
-                        <p>${globalError.message}</p>
-                        <p>${globalError.stack}</p>
-                    </div>
-                `;
-            }
+        // Обработка кликов по фильтрам (только визуальное переключение)
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
         });
     </script>
 </body>
