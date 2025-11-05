@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Персонажи</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" 
+        rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
     <style>
         body {
             background-color: #0a0a0a;
@@ -88,8 +93,16 @@
             color: #ffffff;
         }
 
+        .container-fluid {
+            max-width: 100%;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
         .cards-container {
             margin-top: 20px;
+            padding-left: 0;
+            padding-right: 0;
         }
 
         .character-card {
@@ -154,6 +167,31 @@
                 padding: 6px 12px;
             }
         }
+
+        /* Адаптация для планшетов */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .character-card img {
+                height: 220px;
+            }
+        }
+
+        /* Адаптация для десктопа */
+        @media (min-width: 992px) {
+            .character-card img {
+                height: 250px;
+            }
+            
+            .container.cards-container {
+                max-width: 1200px;
+            }
+        }
+
+        /* Адаптация для больших экранов */
+        @media (min-width: 1400px) {
+            .container.cards-container {
+                max-width: 1400px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -198,83 +236,85 @@
             <button class="filter-btn" data-filter="imported">📥 Импорт</button>
         </div>
 
-        <div class="container cards-container">
-            <div class="row">
-                <!-- Персонаж 1 -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="character-card">
-                        <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
-                        <div class="card-body">
-                            <h5 class="card-title">Алиса</h5>
-                            <div>
-                                <span class="character-badge badge-started">💬 Начато</span>
-                                <span class="character-badge badge-created">✨ Создан</span>
+        <div class="container-fluid cards-container">
+            <div class="container">
+                <div class="row g-3">
+                    <!-- Персонаж 1 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="character-card">
+                            <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
+                            <div class="card-body">
+                                <h5 class="card-title">Алиса</h5>
+                                <div>
+                                    <span class="character-badge badge-started">💬 Начато</span>
+                                    <span class="character-badge badge-created">✨ Создан</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Персонаж 2 -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="character-card">
-                        <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
-                        <div class="card-body">
-                            <h5 class="card-title">Максим</h5>
-                            <div>
-                                <span class="character-badge badge-imported">📥 Импорт</span>
+                    <!-- Персонаж 2 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="character-card">
+                            <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
+                            <div class="card-body">
+                                <h5 class="card-title">Максим</h5>
+                                <div>
+                                    <span class="character-badge badge-imported">📥 Импорт</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Персонаж 3 -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="character-card">
-                        <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
-                        <div class="card-body">
-                            <h5 class="card-title">София</h5>
-                            <div>
-                                <span class="character-badge badge-started">💬 Начато</span>
+                    <!-- Персонаж 3 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="character-card">
+                            <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
+                            <div class="card-body">
+                                <h5 class="card-title">София</h5>
+                                <div>
+                                    <span class="character-badge badge-started">💬 Начато</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Персонаж 4 -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="character-card">
-                        <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
-                        <div class="card-body">
-                            <h5 class="card-title">Дмитрий</h5>
-                            <div>
-                                <span class="character-badge badge-created">✨ Создан</span>
+                    <!-- Персонаж 4 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="character-card">
+                            <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
+                            <div class="card-body">
+                                <h5 class="card-title">Дмитрий</h5>
+                                <div>
+                                    <span class="character-badge badge-created">✨ Создан</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Персонаж 5 -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="character-card">
-                        <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
-                        <div class="card-body">
-                            <h5 class="card-title">Екатерина</h5>
-                            <div>
-                                <span class="character-badge badge-imported">📥 Импорт</span>
-                                <span class="character-badge badge-started">💬 Начато</span>
+                    <!-- Персонаж 5 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="character-card">
+                            <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
+                            <div class="card-body">
+                                <h5 class="card-title">Екатерина</h5>
+                                <div>
+                                    <span class="character-badge badge-imported">📥 Импорт</span>
+                                    <span class="character-badge badge-started">💬 Начато</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Персонаж 6 -->
-                <div class="col-12 col-sm-6 col-lg-4">
-                    <div class="character-card">
-                        <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
-                        <div class="card-body">
-                            <h5 class="card-title">Андрей</h5>
-                            <div>
-                                <span class="character-badge badge-created">✨ Создан</span>
+                    <!-- Персонаж 6 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="character-card">
+                            <img src="https://www.publicdomainpictures.net/pictures/110000/nahled/grey-background.jpg" alt="Character">
+                            <div class="card-body">
+                                <h5 class="card-title">Андрей</h5>
+                                <div>
+                                    <span class="character-badge badge-created">✨ Создан</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -283,7 +323,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz4YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script>
         // Инициализация Telegram WebApp
         let tg = window.Telegram.WebApp;
