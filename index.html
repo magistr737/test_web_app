@@ -14,10 +14,70 @@
             padding-bottom: 20px;
         }
 
+        .navbar {
+            background-color: #1a1a1a !important;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .navbar-brand {
+            color: #ffffff !important;
+            font-weight: 600;
+        }
+
+        .navbar-toggler {
+            border-color: #2a2a2a;
+        }
+
+        .navbar-toggler-icon {
+            filter: invert(1);
+        }
+
+        .offcanvas {
+            background-color: #1a1a1a !important;
+            color: #ffffff;
+        }
+
+        .offcanvas-header {
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .offcanvas-title {
+            color: #ffffff;
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        .nav-link {
+            color: #ffffff !important;
+        }
+
+        .nav-link:hover {
+            color: #0088cc !important;
+        }
+
+        .dropdown-menu {
+            background-color: #2a2a2a;
+        }
+
+        .dropdown-item {
+            color: #ffffff;
+        }
+
+        .dropdown-item:hover {
+            background-color: #3a3a3a;
+            color: #0088cc;
+        }
+
+        .dropdown-divider {
+            border-color: #4a4a4a;
+        }
+
         .filter-buttons {
             padding: 15px;
             position: sticky;
-            top: 0;
+            top: 56px;
             background-color: #0a0a0a;
             z-index: 100;
             border-bottom: 1px solid #2a2a2a;
@@ -43,6 +103,10 @@
             background-color: #0088cc;
             border-color: #0088cc;
             color: #ffffff;
+        }
+
+        .cards-container {
+            margin-top: 20px;
         }
 
         .character-card {
@@ -97,12 +161,6 @@
             background-color: #fd7e14;
         }
 
-        .header-title {
-            padding: 20px 15px 10px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
         @media (max-width: 576px) {
             .character-card img {
                 height: 180px;
@@ -116,11 +174,39 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="header-title">
-            🎭 Мои Персонажи
+    <!-- Navbar с бургер-меню -->
+    <nav class="navbar fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">🎭 Персонажи</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Меню</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">🏠 Главная</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">🎭 Персонажи</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">💬 Чаты</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">⚙️ Настройки</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
+    </nav>
 
+    <div class="container-fluid" style="padding-top: 56px;">
         <div class="filter-buttons">
             <button class="filter-btn active" data-filter="all">Все</button>
             <button class="filter-btn" data-filter="favorite">⭐ Избранные</button>
@@ -129,12 +215,12 @@
             <button class="filter-btn" data-filter="imported">📥 Импорт</button>
         </div>
 
-        <div class="container">
+        <div class="container cards-container">
             <div class="row">
                 <!-- Персонаж 1 -->
                 <div class="col-12 col-sm-6 col-lg-4">
                     <div class="character-card">
-                        <img src="https://via.placeholder.com/300x200/1a1a1a/0088cc?text=Character+1" alt="Character">
+                        <img src="https://placehold.co/300x200/1a1a1a/0088cc?text=Character+1" alt="Character">
                         <div class="card-body">
                             <h5 class="card-title">Алиса</h5>
                             <div>
@@ -148,7 +234,7 @@
                 <!-- Персонаж 2 -->
                 <div class="col-12 col-sm-6 col-lg-4">
                     <div class="character-card">
-                        <img src="https://via.placeholder.com/300x200/1a1a1a/28a745?text=Character+2" alt="Character">
+                        <img src="https://placehold.co/300x200/1a1a1a/28a745?text=Character+2" alt="Character">
                         <div class="card-body">
                             <h5 class="card-title">Максим</h5>
                             <div>
@@ -161,7 +247,7 @@
                 <!-- Персонаж 3 -->
                 <div class="col-12 col-sm-6 col-lg-4">
                     <div class="character-card">
-                        <img src="https://via.placeholder.com/300x200/1a1a1a/6f42c1?text=Character+3" alt="Character">
+                        <img src="https://placehold.co/300x200/1a1a1a/6f42c1?text=Character+3" alt="Character">
                         <div class="card-body">
                             <h5 class="card-title">София</h5>
                             <div>
@@ -174,7 +260,7 @@
                 <!-- Персонаж 4 -->
                 <div class="col-12 col-sm-6 col-lg-4">
                     <div class="character-card">
-                        <img src="https://via.placeholder.com/300x200/1a1a1a/fd7e14?text=Character+4" alt="Character">
+                        <img src="https://placehold.co/300x200/1a1a1a/fd7e14?text=Character+4" alt="Character">
                         <div class="card-body">
                             <h5 class="card-title">Дмитрий</h5>
                             <div>
@@ -187,7 +273,7 @@
                 <!-- Персонаж 5 -->
                 <div class="col-12 col-sm-6 col-lg-4">
                     <div class="character-card">
-                        <img src="https://via.placeholder.com/300x200/1a1a1a/dc3545?text=Character+5" alt="Character">
+                        <img src="https://placehold.co/300x200/1a1a1a/dc3545?text=Character+5" alt="Character">
                         <div class="card-body">
                             <h5 class="card-title">Екатерина</h5>
                             <div>
@@ -201,7 +287,7 @@
                 <!-- Персонаж 6 -->
                 <div class="col-12 col-sm-6 col-lg-4">
                     <div class="character-card">
-                        <img src="https://via.placeholder.com/300x200/1a1a1a/17a2b8?text=Character+6" alt="Character">
+                        <img src="https://placehold.co/300x200/1a1a1a/17a2b8?text=Character+6" alt="Character">
                         <div class="card-body">
                             <h5 class="card-title">Андрей</h5>
                             <div>
