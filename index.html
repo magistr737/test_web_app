@@ -62,13 +62,63 @@
             color: #0088cc !important;
         }
 
-        .filter-buttons {
-            padding: 15px;
+        .search-section {
+            padding: 15px 0;
             position: sticky;
             top: 56px;
             background-color: #0a0a0a;
             z-index: 100;
             border-bottom: 1px solid #2a2a2a;
+        }
+
+        .btn-filters {
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            min-width: 44px;
+            height: 38px;
+        }
+
+        .btn-filters:hover {
+            background-color: #2a2a2a;
+            border-color: #3a3a3a;
+        }
+
+        .search-input {
+            background-color: #1a1a1a !important;
+            border: 1px solid #2a2a2a !important;
+            color: #ffffff !important;
+            border-radius: 8px;
+            padding: 8px 16px;
+            height: 38px;
+        }
+
+        .search-input::placeholder {
+            color: #6a6a6a;
+        }
+
+        .search-input:focus {
+            background-color: #1a1a1a !important;
+            border-color: #0088cc !important;
+            box-shadow: 0 0 0 0.2rem rgba(0, 136, 204, 0.25) !important;
+            color: #ffffff !important;
+        }
+
+        .offcanvas-body .d-grid {
+            padding: 0;
+        }
+
+        .offcanvas-body .filter-btn {
+            margin: 0;
+            border-radius: 8px;
+            text-align: left;
+            justify-content: flex-start;
         }
 
         .filter-btn {
@@ -157,6 +207,16 @@
             background-color: #fd7e14;
         }
 
+        .offcanvas-footer {
+            padding: 15px;
+            margin-top: auto;
+        }
+
+        .offcanvas-footer a:hover {
+            color: #ffffff !important;
+            text-decoration: underline !important;
+        }
+
         @media (max-width: 576px) {
             .character-card img {
                 height: 180px;
@@ -213,27 +273,72 @@
                             <a class="nav-link active" aria-current="page" href="#">🏠 Главная</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">🎭 Персонажи</a>
+                            <a class="nav-link" href="#">✨ Создать персонажа</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">💬 Чаты</a>
+                            <a class="nav-link" href="#">📥 Импортировать персонажа</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">⚙️ Настройки</a>
+                            <a class="nav-link" href="#">💎 Тарифы</a>
                         </li>
                     </ul>
+                    
+                    <!-- Footer в offcanvas -->
+                    <div class="offcanvas-footer mt-auto pt-3 border-top" style="border-color: #2a2a2a !important;">
+                        <div class="text-center small" style="color: #6a6a6a;">
+                            <p class="mb-2">© 2025 RolePlay AI Bot</p>
+                            <p class="mb-2">Все права защищены</p>
+                            <p class="mb-0">
+                                <a href="https://t.me/aiogram_tgbots?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5,%20%D1%8F%20%D1%81%20%D0%B2%D0%B0%D1%88%D0%B5%D0%B3%D0%BE%20%D0%B1%D0%BE%D1%82%D0%B0.%20%D0%9F%D0%B8%D1%88%D1%83%20%D0%B2%D0%B0%D0%BC,%20%D0%BF%D0%BE%20%D0%BF%D1%80%D0%B8%D1%87%D0%B8%D0%BD%D0%B5:" 
+                                target="_blank" 
+                                style="color: #0088cc; text-decoration: none;">
+                                    📞 Техподдержка
+                                </a>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
     <div class="container-fluid" style="padding-top: 56px;">
-        <div class="filter-buttons">
-            <button class="filter-btn active" data-filter="all">Все</button>
-            <button class="filter-btn" data-filter="favorite">⭐ Избранные</button>
-            <button class="filter-btn" data-filter="started">💬 Начатые</button>
-            <button class="filter-btn" data-filter="created">✨ Созданные</button>
-            <button class="filter-btn" data-filter="imported">📥 Импорт</button>
+        <div class="search-section">
+            <div class="container-fluid">
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn-filters" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFilters" aria-controls="offcanvasFilters">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                    </button>
+                    <input class="form-control search-input" type="search" id="searchInput" placeholder="Поиск персонажей" aria-label="Search"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offcanvas для фильтров -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasFilters" aria-labelledby="offcanvasFiltersLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasFiltersLabel">Фильтры</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="d-grid gap-2">
+                    <button class="filter-btn active" data-filter="all">Все</button>
+                    <button class="filter-btn" data-filter="favorite">⭐ Избранные</button>
+                    <button class="filter-btn" data-filter="started">💬 Начатые</button>
+                    <button class="filter-btn" data-filter="created">✨ Созданные</button>
+                    <button class="filter-btn" data-filter="imported">📥 Импорт</button>
+                    <hr class="my-3" style="border-color: #2a2a2a;">
+                    <h6 class="small mb-2" style="color: #ffffff;">Категории</h6>
+                    <button class="filter-btn" data-category="games">🎮 Игры</button>
+                    <button class="filter-btn" data-category="movies">🎬 Фильмы</button>
+                    <button class="filter-btn" data-category="anime">🎌 Аниме</button>
+                    <button class="filter-btn" data-category="series">📺 Сериалы</button>
+                    <button class="filter-btn" data-category="books">📚 Книги</button>
+                    <button class="filter-btn" data-category="other">✨ Другое</button>
+                </div>
+            </div>
         </div>
 
         <div class="container-fluid cards-container">
@@ -328,10 +433,21 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Обработка кликов по фильтрам (только визуальное переключение)
+        const placeholders = ['Поиск: walter white', 'Поиск: genshin impact', 'Поиск: годжо сатору', 'Поиск: капибары'];
+        let currentIndex = 0;
+        const searchInput = document.getElementById('searchInput');
+
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % placeholders.length;
+            searchInput.placeholder = placeholders[currentIndex];
+        }, 3000);
+
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                const isCategoryBtn = this.hasAttribute('data-category');
+                const selector = isCategoryBtn ? '[data-category]' : '[data-filter]';
+                
+                document.querySelectorAll(selector).forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
             });
         });
