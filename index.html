@@ -344,85 +344,6 @@
         <div class="container-fluid cards-container">
             <div class="container">
                 <div class="row g-3">
-                    <!-- Персонаж 1 -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="character-card">
-                            <img src="https://img.freepik.com/premium-photo/grey-textured-background_1310085-63603.jpg?semt=ais_hybrid&w=740&q=80" alt="Character">
-                            <div class="card-body">
-                                <h5 class="card-title">Алиса</h5>
-                                <div>
-                                    <span class="character-badge badge-started">💬 Начато</span>
-                                    <span class="character-badge badge-created">✨ Создан</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Персонаж 2 -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="character-card">
-                            <img src="https://img.freepik.com/premium-photo/grey-textured-background_1310085-63603.jpg?semt=ais_hybrid&w=740&q=80" alt="Character">
-                            <div class="card-body">
-                                <h5 class="card-title">Максим</h5>
-                                <div>
-                                    <span class="character-badge badge-imported">📥 Импорт</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Персонаж 3 -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="character-card">
-                            <img src="https://img.freepik.com/premium-photo/grey-textured-background_1310085-63603.jpg?semt=ais_hybrid&w=740&q=80" alt="Character">
-                            <div class="card-body">
-                                <h5 class="card-title">София</h5>
-                                <div>
-                                    <span class="character-badge badge-started">💬 Начато</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Персонаж 4 -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="character-card">
-                            <img src="https://img.freepik.com/premium-photo/grey-textured-background_1310085-63603.jpg?semt=ais_hybrid&w=740&q=80" alt="Character">
-                            <div class="card-body">
-                                <h5 class="card-title">Дмитрий</h5>
-                                <div>
-                                    <span class="character-badge badge-created">✨ Создан</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Персонаж 5 -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="character-card">
-                            <img src="https://img.freepik.com/premium-photo/grey-textured-background_1310085-63603.jpg?semt=ais_hybrid&w=740&q=80" alt="Character">
-                            <div class="card-body">
-                                <h5 class="card-title">Екатерина</h5>
-                                <div>
-                                    <span class="character-badge badge-imported">📥 Импорт</span>
-                                    <span class="character-badge badge-started">💬 Начато</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Персонаж 6 -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="character-card">
-                            <img src="https://img.freepik.com/premium-photo/grey-textured-background_1310085-63603.jpg?semt=ais_hybrid&w=740&q=80" alt="Character">
-                            <div class="card-body">
-                                <h5 class="card-title">Андрей</h5>
-                                <div>
-                                    <span class="character-badge badge-created">✨ Создан</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -451,6 +372,18 @@
                 this.classList.add('active');
             });
         });
+
+        function updateYear() {
+            const yearElements = document.querySelectorAll('.offcanvas-footer p');
+            if (yearElements.length > 0) {
+                const currentYear = new Date().getFullYear();
+                yearElements[0].innerHTML = `© ${currentYear} RolePlay AI Bot`;
+            }
+        }
+        updateYear();
     </script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="/template/js/characters-list.js"></script>
 </body>
 </html>
