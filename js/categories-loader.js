@@ -2,7 +2,17 @@
 
 const API_BASE_URL = 'https://testapi.capyhub.su/v1/characters';
 
+let categoriesLoaded = false;
+let categoriesLoading = false;
+
 async function loadCategories() {
+    // Предотвращаем повторную загрузку
+    if (categoriesLoaded || categoriesLoading) {
+        return;
+    }
+    
+    categoriesLoading = true;
+    
     const categoriesContainer = document.querySelector('#offcanvasFilters .offcanvas-body');
     const categorySection = categoriesContainer.querySelector('h6').parentElement;
     
@@ -25,7 +35,9 @@ async function loadCategories() {
         const staticButtons = categorySection.querySelectorAll('[data-category]');
         staticButtons.forEach(btn => btn.remove());
 
-        // Создаем и вставляем кнопки для каждой категории
+        // Создаем DocumentFragment для оптимизации DOM-операций
+        const fragment = document.createDocumentFragment();
+        
         categories.forEach(category => {
             const button = document.createElement('button');
             button.className = 'filter-btn';
@@ -38,8 +50,13 @@ async function loadCategories() {
                 this.classList.add('active');
             });
             
-            categorySection.appendChild(button);
+            fragment.appendChild(button);
         });
+        
+        // Одна операция вставки вместо множества
+        categorySection.appendChild(fragment);
+        
+        categoriesLoaded = true;
 
     } catch (error) {
         console.error('Ошибка загрузки категорий:', error);
@@ -56,8 +73,18 @@ async function loadCategories() {
             Перезагрузите страницу, и по идееееееее должно заработать :)
         `;
         categorySection.appendChild(errorMessage);
+    } finally {
+        categoriesLoading = false;
     }
 }
 
-// Запускаем загрузку категорий при загрузке страницы
-document.addEventListener('DOMContentLoaded', loadCategories);
+// Ленивая загрузка при открытии offcanvas с фильтрами
+document.addEventListener('DOMContentLoaded', () => {
+    const filtersOffcanvas = document.getElementById('offcanvasFilters');
+    
+    if (filtersOffcanvas) {
+        filtersOffcanvas.addEventListener('show.bs.offcanvas', () => {
+            loadCategories();
+        });
+    }
+});
