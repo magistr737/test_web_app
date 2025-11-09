@@ -9,11 +9,10 @@ async function loadCategories() {
     
     categoriesLoading = true;
     
-    const categoriesContainer = document.querySelector('#offcanvasFilters .offcanvas-body .d-grid');
-    const categoryHeader = categoriesContainer.querySelector('h6');
+    const categoriesContainer = document.getElementById('categories-container');
     
-    if (!categoryHeader) {
-        console.error('Заголовок категорий не найден');
+    if (!categoriesContainer) {
+        console.error('Контейнер категорий не найден');
         categoriesLoading = false;
         return;
     }
@@ -33,14 +32,10 @@ async function loadCategories() {
         const data = await response.json();
         const categories = data.categories || [];
 
-        // Удаляем старые кнопки категорий (если есть)
-        const existingButtons = categoriesContainer.querySelectorAll('[data-category]');
-        existingButtons.forEach(btn => btn.remove());
+        // Очищаем контейнер
+        categoriesContainer.innerHTML = '';
 
-        // Создаем DocumentFragment для оптимизации DOM-операций
-        const fragment = document.createDocumentFragment();
-        
-        // Вставляем все кнопки после заголовка "Категории"
+        // Добавляем кнопки категорий
         categories.forEach(category => {
             const button = document.createElement('button');
             button.className = 'filter-btn';
@@ -52,37 +47,25 @@ async function loadCategories() {
                 this.classList.add('active');
             });
             
-            // Вставляем после заголовка
-            categoryHeader.insertAdjacentElement('afterend', button);
+            categoriesContainer.appendChild(button);
         });
-        
-        // Вставляем после заголовка "Категории"
-        categoryHeader.insertAdjacentElement('afterend', fragment.firstChild);
-        if (fragment.childNodes.length > 0) {
-            let lastInserted = categoryHeader.nextElementSibling;
-            fragment.childNodes.forEach(node => {
-                lastInserted.insertAdjacentElement('afterend', node);
-                lastInserted = node;
-            });
-        }
         
         categoriesLoaded = true;
 
     } catch (error) {
         console.error('Ошибка загрузки категорий:', error);
         
-        // Удаляем существующие кнопки категорий
-        const existingButtons = categoriesContainer.querySelectorAll('[data-category]');
-        existingButtons.forEach(btn => btn.remove());
+        // Очищаем контейнер
+        categoriesContainer.innerHTML = '';
         
-        // Показываем сообщение об ошибке после заголовка
+        // Показываем сообщение об ошибке
         const errorMessage = document.createElement('p');
         errorMessage.className = 'text-center small text-danger mt-3';
         errorMessage.innerHTML = `
             😔 Билин, не получится категориями воспользоваться<br>
             Перезагрузите страницу, и по идееееееее должно заработать :)
         `;
-        categoryHeader.insertAdjacentElement('afterend', errorMessage);
+        categoriesContainer.appendChild(errorMessage);
     } finally {
         categoriesLoading = false;
     }
