@@ -1,7 +1,5 @@
 // /js/categories-loader.js
 
-const API_BASE_URL = 'https://testapi.capyhub.su/v1';
-
 let categoriesLoaded = false;
 let categoriesLoading = false;
 
