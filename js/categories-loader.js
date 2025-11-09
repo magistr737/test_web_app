@@ -40,6 +40,7 @@ async function loadCategories() {
         // Создаем DocumentFragment для оптимизации DOM-операций
         const fragment = document.createDocumentFragment();
         
+        // Вставляем все кнопки после заголовка "Категории"
         categories.forEach(category => {
             const button = document.createElement('button');
             button.className = 'filter-btn';
@@ -51,7 +52,8 @@ async function loadCategories() {
                 this.classList.add('active');
             });
             
-            categoryHeader.parentNode.insertBefore(button, categoryHeader.nextSibling);
+            // Вставляем после заголовка
+            categoryHeader.insertAdjacentElement('afterend', button);
         });
         
         // Вставляем после заголовка "Категории"
