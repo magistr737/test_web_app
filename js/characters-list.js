@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://testapi.capyhub.su/v1/characters';
+const API_BASE_URL = 'https://testapi.capyhub.su/v1';
 let currentPage = 1;
 let currentFilter = 'all';
 const PAGE_SIZE = 20;
@@ -7,7 +7,7 @@ const PAGE_SIZE = 20;
 async function loadCharacters(filter = 'all', page = 1) {
     try {
         const response = await $.ajax({
-            url: `${API_BASE_URL}/list`,
+            url: `${API_BASE_URL}/characters/list`,
             method: 'GET',
             data: {
                 filter_type: filter,
