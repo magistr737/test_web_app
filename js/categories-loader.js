@@ -1,6 +1,6 @@
 // /js/categories-loader.js
 
-const API_BASE_URL = 'https://testapi.capyhub.su/v1/characters';
+const API_BASE_URL = 'https://testapi.capyhub.su/v1';
 
 let categoriesLoaded = false;
 let categoriesLoading = false;
@@ -23,7 +23,7 @@ async function loadCategories() {
     }
     
     try {
-        const response = await fetch(`${API_BASE_URL}/categories`, {
+        const response = await fetch(`${API_BASE_URL}/characters/categories`, {
             method: 'GET',
             headers: {
                 'X-Telegram-Init-Data': window.Telegram.WebApp.initData
