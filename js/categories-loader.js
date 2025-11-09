@@ -13,8 +13,14 @@ async function loadCategories() {
     
     categoriesLoading = true;
     
-    const categoriesContainer = document.querySelector('#offcanvasFilters .offcanvas-body');
-    const categorySection = categoriesContainer.querySelector('h6').parentElement;
+    const categoriesContainer = document.querySelector('#offcanvasFilters .offcanvas-body .d-grid');
+    const categoryHeader = categoriesContainer.querySelector('h6');
+    
+    if (!categoryHeader) {
+        console.error('Заголовок категорий не найден');
+        categoriesLoading = false;
+        return;
+    }
     
     try {
         const response = await fetch(`${API_BASE_URL}/categories`, {
@@ -31,9 +37,9 @@ async function loadCategories() {
         const data = await response.json();
         const categories = data.categories || [];
 
-        // Удаляем статичные кнопки категорий
-        const staticButtons = categorySection.querySelectorAll('[data-category]');
-        staticButtons.forEach(btn => btn.remove());
+        // Удаляем старые кнопки категорий (если есть)
+        const existingButtons = categoriesContainer.querySelectorAll('[data-category]');
+        existingButtons.forEach(btn => btn.remove());
 
         // Создаем DocumentFragment для оптимизации DOM-операций
         const fragment = document.createDocumentFragment();
@@ -53,38 +59,49 @@ async function loadCategories() {
             fragment.appendChild(button);
         });
         
-        // Одна операция вставки вместо множества
-        categorySection.appendChild(fragment);
+        // Вставляем после заголовка "Категории"
+        categoryHeader.insertAdjacentElement('afterend', fragment.firstChild);
+        if (fragment.childNodes.length > 0) {
+            let lastInserted = categoryHeader.nextElementSibling;
+            fragment.childNodes.forEach(node => {
+                lastInserted.insertAdjacentElement('afterend', node);
+                lastInserted = node;
+            });
+        }
         
         categoriesLoaded = true;
 
     } catch (error) {
         console.error('Ошибка загрузки категорий:', error);
         
-        // Удаляем статичные кнопки
-        const staticButtons = categorySection.querySelectorAll('[data-category]');
-        staticButtons.forEach(btn => btn.remove());
+        // Удаляем существующие кнопки категорий
+        const existingButtons = categoriesContainer.querySelectorAll('[data-category]');
+        existingButtons.forEach(btn => btn.remove());
         
-        // Показываем сообщение об ошибке
+        // Показываем сообщение об ошибке после заголовка
         const errorMessage = document.createElement('p');
         errorMessage.className = 'text-center small text-danger mt-3';
         errorMessage.innerHTML = `
             😔 Билин, не получится категориями воспользоваться<br>
             Перезагрузите страницу, и по идееееееее должно заработать :)
         `;
-        categorySection.appendChild(errorMessage);
+        categoryHeader.insertAdjacentElement('afterend', errorMessage);
     } finally {
         categoriesLoading = false;
     }
 }
 
 // Ленивая загрузка при открытии offcanvas с фильтрами
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCategoriesLoader);
+} else {
+    initCategoriesLoader();
+}
+
+function initCategoriesLoader() {
     const filtersOffcanvas = document.getElementById('offcanvasFilters');
     
     if (filtersOffcanvas) {
-        filtersOffcanvas.addEventListener('show.bs.offcanvas', () => {
-            loadCategories();
-        });
+        filtersOffcanvas.addEventListener('show.bs.offcanvas', loadCategories);
     }
-});
+}
