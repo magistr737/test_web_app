@@ -1,5 +1,3 @@
-// /js/categories-loader.js
-
 let categoriesLoaded = false;
 let categoriesLoading = false;
 
@@ -48,13 +46,12 @@ async function loadCategories() {
             button.setAttribute('data-category', category);
             button.textContent = category;
             
-            // Добавляем обработчик клика
             button.addEventListener('click', function() {
                 document.querySelectorAll('[data-category]').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
             });
             
-            fragment.appendChild(button);
+            categoryHeader.parentNode.insertBefore(button, categoryHeader.nextSibling);
         });
         
         // Вставляем после заголовка "Категории"
