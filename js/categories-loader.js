@@ -9,10 +9,11 @@ async function loadCategories() {
     
     categoriesLoading = true;
     
-    const categoriesContainer = document.getElementById('categories-container');
+    const categoriesContainer = document.querySelector('#offcanvasFilters .offcanvas-body .d-grid');
+    const categoryHeader = categoriesContainer.querySelector('h6');
     
-    if (!categoriesContainer) {
-        console.error('Контейнер категорий не найден');
+    if (!categoryHeader) {
+        console.error('Заголовок категорий не найден');
         categoriesLoading = false;
         return;
     }
@@ -21,7 +22,10 @@ async function loadCategories() {
         const response = await fetch(`${API_BASE_URL}/characters/categories`, {
             method: 'GET',
             headers: {
-                'X-Telegram-Init-Data': window.Telegram.WebApp.initData
+                'X-Telegram-Init-Data': window.Telegram.WebApp.initData,
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             }
         });
 
@@ -32,10 +36,14 @@ async function loadCategories() {
         const data = await response.json();
         const categories = data.categories || [];
 
-        // Очищаем контейнер
-        categoriesContainer.innerHTML = '';
+        // Удаляем старые кнопки категорий (если есть)
+        const existingButtons = categoriesContainer.querySelectorAll('[data-category]');
+        existingButtons.forEach(btn => btn.remove());
 
-        // Добавляем кнопки категорий
+        // Создаем DocumentFragment для оптимизации DOM-операций
+        const fragment = document.createDocumentFragment();
+        
+        // Вставляем все кнопки после заголовка "Категории"
         categories.forEach(category => {
             const button = document.createElement('button');
             button.className = 'filter-btn';
@@ -47,25 +55,37 @@ async function loadCategories() {
                 this.classList.add('active');
             });
             
-            categoriesContainer.appendChild(button);
+            // Вставляем после заголовка
+            categoryHeader.insertAdjacentElement('afterend', button);
         });
+        
+        // Вставляем после заголовка "Категории"
+        categoryHeader.insertAdjacentElement('afterend', fragment.firstChild);
+        if (fragment.childNodes.length > 0) {
+            let lastInserted = categoryHeader.nextElementSibling;
+            fragment.childNodes.forEach(node => {
+                lastInserted.insertAdjacentElement('afterend', node);
+                lastInserted = node;
+            });
+        }
         
         categoriesLoaded = true;
 
     } catch (error) {
         console.error('Ошибка загрузки категорий:', error);
         
-        // Очищаем контейнер
-        categoriesContainer.innerHTML = '';
+        // Удаляем существующие кнопки категорий
+        const existingButtons = categoriesContainer.querySelectorAll('[data-category]');
+        existingButtons.forEach(btn => btn.remove());
         
-        // Показываем сообщение об ошибке
+        // Показываем сообщение об ошибке после заголовка
         const errorMessage = document.createElement('p');
         errorMessage.className = 'text-center small text-danger mt-3';
         errorMessage.innerHTML = `
             😔 Билин, не получится категориями воспользоваться<br>
             Перезагрузите страницу, и по идееееееее должно заработать :)
         `;
-        categoriesContainer.appendChild(errorMessage);
+        categoryHeader.insertAdjacentElement('afterend', errorMessage);
     } finally {
         categoriesLoading = false;
     }
