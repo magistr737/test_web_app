@@ -4,7 +4,15 @@ let currentFilter = 'all';
 const PAGE_SIZE = 20;
 
 // Загрузка персонажей
+// Добавь после объявления констант в начале файла
+let requestCounter = 0;
+const connectionTimings = [];
+
+// Модифицируй функцию loadCharacters - добавь перед try блоком:
 async function loadCharacters(filter = 'all', page = 1) {
+    const requestId = ++requestCounter;
+    const startTime = performance.now();
+    
     try {
         const response = await $.ajax({
             url: `${API_BASE_URL}/characters/list`,
@@ -20,8 +28,45 @@ async function loadCharacters(filter = 'all', page = 1) {
                 'Pragma': 'no-cache',
                 'Expires': '0',
             },
-            timeout: 10000
+            timeout: 10000,
+            // Добавь обработчик для отслеживания
+            beforeSend: function(xhr) {
+                console.log(`[Request #${requestId}] Starting...`);
+            }
         });
+
+        const endTime = performance.now();
+        const timing = endTime - startTime;
+        
+        connectionTimings.push({
+            requestId,
+            timing,
+            filter,
+            page
+        });
+
+        // Анализ переиспользования соединений
+        console.log(`[Request #${requestId}] Completed in ${timing.toFixed(2)}ms`);
+        
+        if (connectionTimings.length > 1) {
+            const avgTime = connectionTimings.reduce((sum, t) => sum + t.timing, 0) / connectionTimings.length;
+            const firstRequestTime = connectionTimings[0].timing;
+            
+            console.log('=== Connection Reuse Analysis ===');
+            console.log(`First request: ${firstRequestTime.toFixed(2)}ms`);
+            console.log(`Current request: ${timing.toFixed(2)}ms`);
+            console.log(`Average time: ${avgTime.toFixed(2)}ms`);
+            
+            // Если последующие запросы быстрее первого на 20%+, вероятно есть переиспользование
+            if (requestId > 1 && timing < firstRequestTime * 0.8) {
+                console.log('✅ Likely TCP connection reuse detected (faster subsequent request)');
+            } else if (requestId > 1 && timing > firstRequestTime * 1.2) {
+                console.log('⚠️ Possible new connection (slower than first request)');
+            } else {
+                console.log('ℹ️ Similar timing - inconclusive');
+            }
+            console.log('================================');
+        }
 
         renderCharacters(response.characters);
         renderPagination(response.current_page, response.total_pages);
@@ -29,6 +74,8 @@ async function loadCharacters(filter = 'all', page = 1) {
         currentPage = response.current_page;
         currentFilter = filter;
     } catch (error) {
+        const endTime = performance.now();
+        console.error(`[Request #${requestId}] Failed after ${(endTime - startTime).toFixed(2)}ms`);
         console.error('Ошибка загрузки персонажей:', error);
         console.error('Детали ошибки:', {
             status: error.status,
