@@ -3,8 +3,152 @@ let currentPage = 1;
 let currentFilter = 'all';
 const PAGE_SIZE = 20;
 
+// Система мониторинга соединений и производительности
+const ConnectionMonitor = {
+    requests: [],
+    connectionId: null,
+    
+    init() {
+        this.connectionId = Date.now();
+        console.log(`%c🔌 Connection Monitor инициализирован`, 'color: #4CAF50; font-weight: bold');
+        console.log(`%c📊 Connection ID: ${this.connectionId}`, 'color: #2196F3');
+        
+        // Проверка поддержки Performance API
+        if (window.performance && window.performance.getEntriesByType) {
+            console.log('%c✅ Performance API поддерживается', 'color: #4CAF50');
+        } else {
+            console.warn('%c⚠️ Performance API не поддерживается', 'color: #FF9800');
+        }
+    },
+    
+    logRequest(url, method, startTime) {
+        const request = {
+            url,
+            method,
+            startTime,
+            id: this.requests.length + 1
+        };
+        this.requests.push(request);
+        
+        console.groupCollapsed(`%c📤 Запрос #${request.id}: ${method} ${url}`, 'color: #2196F3; font-weight: bold');
+        console.log(`%c⏰ Время начала: ${new Date(startTime).toISOString()}`, 'color: #9E9E9E');
+        console.log(`%c🔗 URL: ${url}`, 'color: #9E9E9E');
+        console.groupEnd();
+        
+        return request.id;
+    },
+    
+    logResponse(requestId, responseData, error = null) {
+        const request = this.requests[requestId - 1];
+        const endTime = Date.now();
+        const duration = endTime - request.startTime;
+        
+        request.endTime = endTime;
+        request.duration = duration;
+        request.success = !error;
+        
+        if (error) {
+            console.groupCollapsed(`%c❌ Ответ #${requestId}: ОШИБКА (${duration}ms)`, 'color: #F44336; font-weight: bold');
+            console.error('Ошибка:', error);
+        } else {
+            console.groupCollapsed(`%c📥 Ответ #${requestId}: SUCCESS (${duration}ms)`, 'color: #4CAF50; font-weight: bold');
+        }
+        
+        console.log(`%c⏱️ Длительность: ${duration}ms`, duration > 1000 ? 'color: #FF9800' : 'color: #4CAF50');
+        
+        // Анализ Performance API
+        this.analyzeConnectionReuse(request.url);
+        
+        console.groupEnd();
+    },
+    
+    analyzeConnectionReuse(url) {
+        if (!window.performance || !window.performance.getEntriesByType) return;
+        
+        const resources = performance.getEntriesByType('resource');
+        const matchingResource = resources.filter(r => r.name.includes('characters/list')).pop();
+        
+        if (matchingResource) {
+            console.groupCollapsed('%c🔍 Детальный анализ соединения', 'color: #9C27B0; font-weight: bold');
+            
+            const timing = {
+                dns: matchingResource.domainLookupEnd - matchingResource.domainLookupStart,
+                tcp: matchingResource.connectEnd - matchingResource.connectStart,
+                ssl: matchingResource.secureConnectionStart > 0 ? 
+                     matchingResource.connectEnd - matchingResource.secureConnectionStart : 0,
+                ttfb: matchingResource.responseStart - matchingResource.requestStart,
+                download: matchingResource.responseEnd - matchingResource.responseStart,
+                total: matchingResource.duration
+            };
+            
+            // Проверка переиспользования соединения
+            const isConnectionReused = timing.tcp === 0 && timing.dns === 0;
+            
+            console.log(`%c🔌 TCP соединение переиспользовано: ${isConnectionReused ? '✅ ДА' : '❌ НЕТ'}`, 
+                       isConnectionReused ? 'color: #4CAF50; font-weight: bold; font-size: 14px' : 'color: #FF9800; font-weight: bold; font-size: 14px');
+            
+            if (isConnectionReused) {
+                console.log('%c💡 Отлично! CloudFlare эффективно использует существующее соединение', 'color: #4CAF50');
+            } else {
+                console.log('%c⚠️ Создано новое TCP соединение. Возможны проблемы с keep-alive', 'color: #FF9800');
+            }
+            
+            console.table({
+                'DNS Lookup': `${timing.dns.toFixed(2)}ms`,
+                'TCP Handshake': `${timing.tcp.toFixed(2)}ms`,
+                'SSL/TLS': `${timing.ssl.toFixed(2)}ms`,
+                'Time to First Byte': `${timing.ttfb.toFixed(2)}ms`,
+                'Download': `${timing.download.toFixed(2)}ms`,
+                'Total': `${timing.total.toFixed(2)}ms`
+            });
+            
+            // HTTP/2 или HTTP/3 проверка
+            if (matchingResource.nextHopProtocol) {
+                console.log(`%c🌐 Протокол: ${matchingResource.nextHopProtocol}`, 'color: #2196F3');
+                
+                if (matchingResource.nextHopProtocol.includes('h2') || matchingResource.nextHopProtocol.includes('h3')) {
+                    console.log('%c✨ Используется современный протокол с мультиплексированием', 'color: #4CAF50');
+                }
+            }
+            
+            console.groupEnd();
+        }
+    },
+    
+    getStatistics() {
+        const successful = this.requests.filter(r => r.success).length;
+        const failed = this.requests.filter(r => !r.success).length;
+        const avgDuration = this.requests.reduce((sum, r) => sum + (r.duration || 0), 0) / this.requests.length;
+        
+        console.groupCollapsed('%c📊 Статистика соединений', 'color: #9C27B0; font-weight: bold; font-size: 16px');
+        console.log(`%c📈 Всего запросов: ${this.requests.length}`, 'color: #2196F3');
+        console.log(`%c✅ Успешных: ${successful}`, 'color: #4CAF50');
+        console.log(`%c❌ Ошибок: ${failed}`, 'color: #F44336');
+        console.log(`%c⏱️ Средняя длительность: ${avgDuration.toFixed(2)}ms`, 'color: #FF9800');
+        console.table(this.requests.map(r => ({
+            'ID': r.id,
+            'Метод': r.method,
+            'Успех': r.success ? '✅' : '❌',
+            'Длительность': r.duration ? `${r.duration}ms` : 'N/A'
+        })));
+        console.groupEnd();
+    }
+};
+
+// Инициализация монитора
+ConnectionMonitor.init();
+
 // Загрузка персонажей
 async function loadCharacters(filter = 'all', page = 1) {
+    const startTime = Date.now();
+    const requestId = ConnectionMonitor.logRequest(
+        `${API_BASE_URL}/characters/list?filter_type=${filter}&page=${page}`,
+        'GET',
+        startTime
+    );
+    
+    console.log(`%c🎯 Загрузка персонажей: filter=${filter}, page=${page}`, 'color: #00BCD4; font-weight: bold');
+    
     try {
         const response = await $.ajax({
             url: `${API_BASE_URL}/characters/list`,
@@ -19,8 +163,15 @@ async function loadCharacters(filter = 'all', page = 1) {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
                 'Pragma': 'no-cache',
                 'Expires': '0',
-                'Connection': 'close'
+                'Connection': 'keep-alive'
             }
+        });
+
+        console.log(`%c✅ Данные получены:`, 'color: #4CAF50', {
+            'Всего персонажей': response.characters.length,
+            'Текущая страница': response.current_page,
+            'Всего страниц': response.total_pages,
+            'Фильтр': filter
         });
 
         renderCharacters(response.characters);
@@ -28,8 +179,19 @@ async function loadCharacters(filter = 'all', page = 1) {
         
         currentPage = response.current_page;
         currentFilter = filter;
+        
+        ConnectionMonitor.logResponse(requestId, response);
+        
     } catch (error) {
-        console.error('Ошибка загрузки персонажей:', error);
+        console.error('%c💥 КРИТИЧЕСКАЯ ОШИБКА загрузки персонажей:', 'color: #F44336; font-weight: bold', {
+            'Статус': error.status,
+            'Текст': error.statusText,
+            'Ответ': error.responseText,
+            'Фильтр': filter,
+            'Страница': page
+        });
+        
+        ConnectionMonitor.logResponse(requestId, null, error);
         showError();
     }
 }
@@ -265,7 +427,13 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, m => map[m]);
 }
 
+// Глобальная функция для просмотра статистики в консоли
+window.showConnectionStats = function() {
+    ConnectionMonitor.getStatistics();
+};
+
 // Инициализация при загрузке страницы
 $(document).ready(function() {
+    console.log('%c💡 Для просмотра статистики соединений введите: showConnectionStats()', 'color: #2196F3; font-size: 12px');
     loadCharacters('all', 1);
 });
