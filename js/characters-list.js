@@ -28,8 +28,6 @@ async function loadCharacters(filter = 'all', page = 1) {
                 'Pragma': 'no-cache',
                 'Expires': '0',
             },
-            timeout: 10000,
-            // Добавь обработчик для отслеживания
             beforeSend: function(xhr) {
                 console.log(`[Request #${requestId}] Starting...`);
             }
