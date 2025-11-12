@@ -271,6 +271,41 @@
             animation: spinner-border 0.75s linear infinite;
         }
 
+        .dropdown-menu-dark .dropdown-item {
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .dropdown-menu-dark .dropdown-item:hover {
+            background-color: #2a2a2a;
+        }
+
+        .dropdown-menu-dark .dropdown-item.active {
+            background-color: #0088cc;
+        }
+
+        .category-inline-btn {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #2a2a2a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            transition: all 0.3s;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .category-inline-btn:hover {
+            background-color: #2a2a2a;
+            border-color: #3a3a3a;
+        }
+
+        .category-inline-btn.active {
+            background-color: #0088cc;
+            border-color: #0088cc;
+        }
+
         @keyframes spinner-border {
             to { transform: rotate(360deg); }
         }
@@ -371,6 +406,22 @@
                     </button>
                     <input class="form-control search-input" type="search" id="searchInput" placeholder="Поиск персонажей" aria-label="Search"/>
                 </div>
+                
+                <!-- Блок категорий -->
+                <div id="categories-section" class="mt-3" style="display: none;">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="small" style="color: #b0b0b0; white-space: nowrap;">Категории:</span>
+                        <div id="categories-inline" class="d-flex flex-wrap gap-2 flex-grow-1"></div>
+                        <div class="dropdown" id="categories-dropdown" style="display: none;">
+                            <button class="btn-filters dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Ещё
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark" id="categories-dropdown-menu" style="background-color: #1a1a1a; border-color: #2a2a2a;">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
                 <div id="selected-categories" class="mt-2" style="display: none;">
                     <div class="d-flex flex-wrap gap-2"></div>
                 </div>
