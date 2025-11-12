@@ -7,10 +7,6 @@ let selectedCategories = [];
 let categoriesLoaded = false;
 let categoriesLoading = false;
 
-let scrollStartX = 0;
-let scrollStartTime = 0;
-let isScrolling = false;
-
 
 const DOM = {
     cardsContainer: document.querySelector('.cards-container'),
@@ -168,49 +164,80 @@ function initCategoriesScroll() {
     if (!container) return;
     
     let startX, scrollLeft;
+    let isDragging = false;
+    let hasMoved = false;
     
     container.addEventListener('mousedown', (e) => {
         if (e.target.closest('[data-category]')) {
-            startX = e.pageX;
+            isDragging = true;
+            hasMoved = false;
+            startX = e.pageX - container.offsetLeft;
             scrollLeft = container.scrollLeft;
-            scrollStartX = e.pageX;
-            scrollStartTime = Date.now();
-            isScrolling = false;
+            container.style.cursor = 'grabbing';
+            container.style.userSelect = 'none';
+            container.style.scrollBehavior = 'auto';
         }
     });
-    
+
     container.addEventListener('mousemove', (e) => {
-        if (startX !== undefined) {
-            const distance = Math.abs(e.pageX - scrollStartX);
-            if (distance > 5) {
-                isScrolling = true;
-                const walk = (scrollStartX - e.pageX);
-                container.scrollLeft = scrollLeft + walk;
-            }
+        if (!isDragging) return;
+        e.preventDefault();
+        
+        const x = e.pageX - container.offsetLeft;
+        const walk = (x - startX);
+        
+        if (Math.abs(walk) > 5) {
+            hasMoved = true;
         }
+        
+        requestAnimationFrame(() => {
+            container.scrollLeft = scrollLeft - walk;
+        });
     });
-    
+            
     container.addEventListener('mouseup', () => {
-        startX = undefined;
+        isDragging = false;
+        container.style.cursor = 'grab';
+        container.style.userSelect = '';
+        
+        setTimeout(() => {
+            hasMoved = false;
+        }, 50);
     });
     
     container.addEventListener('mouseleave', () => {
-        startX = undefined;
+        isDragging = false;
+        container.style.cursor = 'grab';
+        container.style.userSelect = '';
     });
     
+    // Добавляем стиль курсора
+    container.style.cursor = 'grab';
+    
     // Для touch устройств
+    let touchStartX = 0;
+    let touchHasMoved = false;
+    
     container.addEventListener('touchstart', (e) => {
-        scrollStartX = e.touches[0].pageX;
-        scrollStartTime = Date.now();
-        isScrolling = false;
+        touchStartX = e.touches[0].pageX;
+        touchHasMoved = false;
     });
     
     container.addEventListener('touchmove', (e) => {
-        const distance = Math.abs(e.touches[0].pageX - scrollStartX);
+        const distance = Math.abs(e.touches[0].pageX - touchStartX);
         if (distance > 5) {
-            isScrolling = true;
+            touchHasMoved = true;
         }
     });
+    
+    container.addEventListener('touchend', () => {
+        setTimeout(() => {
+            touchHasMoved = false;
+        }, 50);
+    });
+    
+    container._hasMoved = () => hasMoved;
+    container._touchHasMoved = () => touchHasMoved;
 }
 
 function renderCharacters(characters) {
@@ -313,7 +340,10 @@ function updateCategoryUI() {
         el.classList.toggle('active', isSelected);
         el.textContent = isSelected ? `✓ ${category}` : category;
     });
-    DOM.selectedCategories.container.style.display = 'none';
+    
+    if (DOM.selectedCategories.container) {
+        DOM.selectedCategories.container.style.display = 'none';
+    }
 }
 
 function toggleCategory(category) {
@@ -345,10 +375,12 @@ function handleFilterClick(event) {
 
 function handleCategoryClick(event) {
     event.preventDefault();
-    if (isScrolling) {
-        isScrolling = false;
+    
+    const container = document.querySelector('.categories-scroll-container');
+    if (container && (container._hasMoved?.() || container._touchHasMoved?.())) {
         return;
     }
+    
     const target = event.target.closest('[data-category]');
     if (!target) return;
     toggleCategory(target.dataset.category);
