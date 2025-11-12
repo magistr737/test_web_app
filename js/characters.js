@@ -168,15 +168,13 @@ function initCategoriesScroll() {
     let hasMoved = false;
     
     container.addEventListener('mousedown', (e) => {
-        if (e.target.closest('[data-category]')) {
-            isDragging = true;
-            hasMoved = false;
-            startX = e.pageX - container.offsetLeft;
-            scrollLeft = container.scrollLeft;
-            container.style.cursor = 'grabbing';
-            container.style.userSelect = 'none';
-            container.style.scrollBehavior = 'auto';
-        }
+        isDragging = true;
+        hasMoved = false;
+        startX = e.pageX - container.offsetLeft;
+        scrollLeft = container.scrollLeft;
+        container.style.cursor = 'grabbing';
+        container.style.userSelect = 'none';
+        container.style.scrollBehavior = 'auto';
     });
 
     container.addEventListener('mousemove', (e) => {
@@ -211,10 +209,7 @@ function initCategoriesScroll() {
         container.style.userSelect = '';
     });
     
-    // Добавляем стиль курсора
     container.style.cursor = 'grab';
-    
-    // Для touch устройств
     let touchStartX = 0;
     let touchHasMoved = false;
     
