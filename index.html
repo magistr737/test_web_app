@@ -225,6 +225,7 @@
             scrollbar-width: none;
             padding: 1px 0;
             scroll-behavior: smooth;
+            user-select: none;
         }
 
         .categories-scroll-container::-webkit-scrollbar {
@@ -241,6 +242,10 @@
         .category-inline-btn {
             flex-shrink: 0;
             cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         @media (max-width: 576px) {
@@ -410,6 +415,6 @@
     </script>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
-    <script src="js/characters.js" defer></script>
+    <script src="/js/characters.js" defer></script>
 </body>
 </html>
