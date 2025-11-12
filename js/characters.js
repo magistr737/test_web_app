@@ -5,6 +5,7 @@ let currentPage = 1;
 let currentFilter = 'all';
 let currentCategory = null;
 const PAGE_SIZE = 20;
+let selectedCategories = [];
 
 let categoriesLoaded = false;
 let categoriesLoading = false;
@@ -45,14 +46,16 @@ async function fetchCategories() {
 /**
  * Получение списка персонажей
  */
-async function fetchCharacters(filter, page, category) {
+async function fetchCharacters(filter, page, categories) {
     const params = new URLSearchParams({
         filter_type: filter,
         page: page.toString(),
         page_size: PAGE_SIZE.toString()
     });
     
-    if (category) params.append('category', category);
+    if (categories && categories.length > 0) {
+        categories.forEach(cat => params.append('category', cat));
+    }
     
     return apiRequest(`/v1/characters/list?${params}`, { method: 'GET' });
 }
@@ -176,6 +179,12 @@ async function loadCategories() {
                     'data-category': category 
                 }
             });
+            
+            // Проверяем, выбрана ли категория
+            if (selectedCategories.includes(category)) {
+                btn.classList.add('active');
+            }
+            
             btn.addEventListener('click', handleCategoryClick);
             fragment.appendChild(btn);
         });
@@ -195,33 +204,35 @@ function handleCategoryClick(event) {
     const button = event.currentTarget;
     const category = button.getAttribute('data-category');
     
-    removeElements('.filter-btn.active', button.parentElement);
-    button.classList.add('active');
-    
-    currentCategory = category;
-    loadCharacters(currentFilter, 1, category);
-    closeOffcanvas();
+    toggleCategory(category);
 }
 
 // ==============================================
 // Загрузка персонажей
 // ==============================================
 
-async function loadCharacters(filter = 'all', page = 1, category = null) {
+async function loadCharacters(filter = 'all', page = 1, categories = []) {
+    const container = document.querySelector('.cards-container .row');
+    
+    // Показываем индикатор загрузки
+    showLoadingSpinner(container?.parentElement);
+    
     try {
-        const data = await fetchCharacters(filter, page, category);
+        const data = await fetchCharacters(filter, page, categories);
         
         renderCharacters(data.characters || []);
         renderPagination(data.current_page || 1, data.total_pages || 1);
         
         currentPage = data.current_page || 1;
         currentFilter = filter;
-        currentCategory = category;
         
     } catch (error) {
         console.error('Ошибка загрузки персонажей:', error);
-        const container = clearContainer('.cards-container .row');
+        clearContainer('.cards-container .row');
         showCharactersError(container);
+    } finally {
+        // Скрываем индикатор загрузки
+        hideLoadingSpinner(container?.parentElement);
     }
 }
 
@@ -423,7 +434,10 @@ function initFilterHandlers() {
         btn.addEventListener('click', (e) => {
             const filter = e.currentTarget.getAttribute('data-filter');
             
-            removeElements('.filter-btn.active');
+            // Убираем класс active у всех кнопок с data-filter
+            document.querySelectorAll('.filter-btn[data-filter]').forEach(b => 
+                b.classList.remove('active')
+            );
             e.currentTarget.classList.add('active');
             
             currentCategory = null;
@@ -441,6 +455,119 @@ function closeOffcanvas() {
     }
 }
 
+function updateCategoryButtons() {
+    document.querySelectorAll('[data-category]').forEach(btn => {
+        const category = btn.getAttribute('data-category');
+        if (selectedCategories.includes(category)) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+
+// ==============================================
+// Управление выбранными категориями
+// ==============================================
+
+/**
+ * Отображение выбранных категорий
+ */
+function renderSelectedCategories() {
+    const container = document.querySelector('#selected-categories');
+    const wrapper = container?.querySelector('.d-flex');
+    
+    if (!container || !wrapper) return;
+    
+    if (selectedCategories.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'block';
+    wrapper.innerHTML = '';
+    
+    selectedCategories.forEach(category => {
+        const badge = createElement('span', {
+            className: 'selected-category-badge',
+            text: category
+        });
+        
+        const removeIcon = createElement('span', {
+            className: 'remove-icon',
+            text: '×'
+        });
+        
+        removeIcon.addEventListener('click', () => {
+            toggleCategory(category);
+        });
+        
+        badge.appendChild(removeIcon);
+        wrapper.appendChild(badge);
+    });
+}
+
+/**
+ * Переключение категории (добавить/удалить)
+ */
+function toggleCategory(category) {
+    const index = selectedCategories.indexOf(category);
+    
+    if (index > -1) {
+        // Удаляем категорию
+        selectedCategories.splice(index, 1);
+    } else {
+        // Добавляем категорию (максимум 5)
+        if (selectedCategories.length < 5) {
+            selectedCategories.push(category);
+        } else {
+            // Можно показать уведомление что максимум 5 категорий
+            return;
+        }
+    }
+    
+    // Обновляем визуал кнопок категорий
+    updateCategoryButtons();
+    
+    // Обновляем отображение выбранных категорий
+    renderSelectedCategories();
+    
+    // Загружаем персонажей с новыми категориями
+    loadCharacters(currentFilter, 1, selectedCategories);
+}
+
+// ==============================================
+// Показ/скрытие индикатора загрузки
+// ==============================================
+
+/**
+ * Показать индикатор загрузки
+ */
+function showLoadingSpinner(container) {
+    if (!container) return;
+    
+    // Проверяем, есть ли уже overlay
+    let overlay = container.querySelector('.loading-overlay');
+    if (overlay) return;
+    
+    overlay = createElement('div', { className: 'loading-overlay' });
+    const spinner = createElement('div', { className: 'spinner-border-custom' });
+    
+    overlay.appendChild(spinner);
+    container.style.position = 'relative';
+    container.appendChild(overlay);
+}
+
+/**
+ * Скрыть индикатор загрузки
+ */
+function hideLoadingSpinner(container) {
+    if (!container) return;
+    
+    const overlay = container.querySelector('.loading-overlay');
+    if (overlay) overlay.remove();
+}
+
 // ==============================================
 // Инициализация
 // ==============================================
@@ -452,7 +579,7 @@ function init() {
     }
     
     initFilterHandlers();
-    loadCharacters('all', 1);
+    loadCharacters('all', 1, []);
 }
 
 if (document.readyState === 'loading') {
