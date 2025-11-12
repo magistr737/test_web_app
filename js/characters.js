@@ -7,6 +7,10 @@ let selectedCategories = [];
 let categoriesLoaded = false;
 let categoriesLoading = false;
 
+let currentSearchQuery = '';
+let searchTimeout = null;
+
+
 
 const DOM = {
     cardsContainer: document.querySelector('.cards-container'),
@@ -22,6 +26,7 @@ const DOM = {
     },
     filterButtons: document.querySelectorAll('.filter-btn[data-filter]'),
     offcanvasFilters: document.getElementById('offcanvasFilters'),
+    searchInput: document.getElementById('searchInput'),
 };
 
 async function apiRequest(endpoint, options = {}) {
@@ -41,7 +46,7 @@ async function apiRequest(endpoint, options = {}) {
 
 const fetchCategories = () => apiRequest('/v1/characters/categories');
 
-const fetchCharacters = (filter, page, categories) => {
+const fetchCharacters = (filter, page, categories, searchQuery) => {
     const params = new URLSearchParams({
         filter_type: filter,
         page: page.toString(),
@@ -49,6 +54,9 @@ const fetchCharacters = (filter, page, categories) => {
     });
     if (categories?.length) {
         categories.forEach(cat => params.append('category', cat));
+    }
+    if (searchQuery) {
+        params.append('search_query', searchQuery);
     }
     return apiRequest(`/v1/characters/list?${params.toString()}`);
 };
@@ -143,20 +151,45 @@ function createCategoryButton(category, className, tag = 'button') {
     return el;
 }
 
-async function loadCharacters(filter, page, categories) {
+async function loadCharacters(filter, page, categories, searchQuery = '') {
     showLoadingSpinner(true);
     try {
-        const data = await fetchCharacters(filter, page, categories);
+        const data = await fetchCharacters(filter, page, categories, searchQuery);
         renderCharacters(data.characters || []);
         renderPagination(data.current_page || 1, data.total_pages || 1);
         currentPage = data.current_page || 1;
         currentFilter = filter;
+        currentSearchQuery = searchQuery;
     } catch (error) {
         console.error('Ошибка загрузки персонажей:', error);
         showCharactersError();
     } finally {
         showLoadingSpinner(false);
     }
+}
+
+function validateSearchQuery(query) {
+    if (!query) return '';
+    if (query.length > 20) return null;
+    if (!/^[a-zA-Zа-яА-ЯёЁ0-9\s]+$/.test(query)) return null;
+    return query.trim();
+}
+
+function handleSearchInput() {
+    clearTimeout(searchTimeout);
+    DOM.searchInput.classList.remove('is-invalid');
+    
+    searchTimeout = setTimeout(() => {
+        const query = DOM.searchInput.value;
+        const validQuery = validateSearchQuery(query);
+        
+        if (query && validQuery === null) {
+            DOM.searchInput.classList.add('is-invalid');
+            return;
+        }
+        
+        loadCharacters(currentFilter, 1, selectedCategories, validQuery || '');
+    }, 500);
 }
 
 function initCategoriesScroll() {
@@ -208,7 +241,7 @@ function initCategoriesScroll() {
         container.style.cursor = 'grab';
         container.style.userSelect = '';
     });
-    
+
     container.style.cursor = 'grab';
     let touchStartX = 0;
     let touchHasMoved = false;
@@ -350,7 +383,7 @@ function toggleCategory(category) {
     }
     
     updateCategoryUI();
-    loadCharacters(currentFilter, 1, selectedCategories);
+    loadCharacters(currentFilter, 1, selectedCategories, currentSearchQuery);
 }
 
 function handleFilterClick(event) {
@@ -360,8 +393,7 @@ function handleFilterClick(event) {
     
     selectedCategories = [];
     updateCategoryUI();
-
-    loadCharacters(filter, 1, []);
+    loadCharacters(filter, 1, [], currentSearchQuery);
     
     if (DOM.offcanvasFilters) {
         bootstrap.Offcanvas.getInstance(DOM.offcanvasFilters)?.hide();
@@ -387,7 +419,7 @@ function handlePaginationClick(event) {
         event.preventDefault();
         const page = parseInt(link.dataset.page, 10);
         if (page) {
-            loadCharacters(currentFilter, page, selectedCategories);
+            loadCharacters(currentFilter, page, selectedCategories, currentSearchQuery);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
@@ -399,10 +431,12 @@ function init() {
     DOM.selectedCategories.wrapper?.addEventListener('click', handleCategoryClick);
     DOM.cardsContainer.addEventListener('click', handlePaginationClick);
     
-    initCategoriesScroll();
+    if (DOM.searchInput) {
+        DOM.searchInput.addEventListener('input', handleSearchInput);
+    }
     
+    initCategoriesScroll();
     loadCharacters('all', 1, []);
     loadCategories();
 }
-
 document.addEventListener('DOMContentLoaded', init);
