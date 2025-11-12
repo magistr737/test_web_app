@@ -359,10 +359,43 @@ function showEmptyState() {
     ];
     const msg = messages[Math.floor(Math.random() * messages.length)];
     const col = createElement('div', { className: 'col-12 text-center py-5' });
+    
+    const backBtn = createElement('button', { 
+        className: 'btn btn-primary mt-3', 
+        text: '🏠 Вернуться к путешествиям' 
+    });
+    
+    backBtn.addEventListener('click', () => {
+        // Сброс фильтров
+        DOM.filterButtons.forEach(b => b.classList.remove('active'));
+        DOM.filterButtons.forEach(b => {
+            if (b.dataset.filter === 'all') {
+                b.classList.add('active');
+            }
+        });
+        
+        // Очистка поиска
+        if (DOM.searchInput) {
+            DOM.searchInput.value = '';
+            DOM.searchInput.classList.remove('active', 'is-invalid');
+        }
+        if (DOM.searchButton) {
+            DOM.searchButton.style.display = 'none';
+        }
+        
+        // Сброс категорий
+        selectedCategories = [];
+        updateCategoryUI();
+        
+        // Загрузка всех персонажей
+        loadCharacters('all', 1, [], '');
+    });
+    
     col.append(
         createElement('div', { text: msg.emoji, styles: { fontSize: '72px', marginBottom: '20px' } }),
         createElement('h4', { text: msg.title, styles: { marginBottom: '15px' } }),
-        createElement('p', { text: msg.text, styles: { maxWidth: '400px', margin: '0 auto' } })
+        createElement('p', { text: msg.text, styles: { maxWidth: '400px', margin: '0 auto' } }),
+        backBtn
     );
     DOM.cardsRow.appendChild(col);
 }
