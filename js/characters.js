@@ -1,5 +1,3 @@
-// js/main.js - Оптимизированная версия
-
 const API_BASE_URL = 'https://testapi.capyhub.su';
 const PAGE_SIZE = 20;
 
@@ -123,7 +121,7 @@ function renderCategories(categories) {
     clearContainer(DOM.categories.inline);
     clearContainer(DOM.categories.dropdownMenu);
 
-    const maxInline = 5;
+    const maxInline = window.innerWidth < 576 ? 2 : window.innerWidth < 992 ? 4 : 6;
     const inlineCategories = categories.slice(0, maxInline);
     const dropdownCategories = categories.slice(maxInline);
     
