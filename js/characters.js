@@ -27,6 +27,7 @@ const DOM = {
     filterButtons: document.querySelectorAll('.filter-btn[data-filter]'),
     offcanvasFilters: document.getElementById('offcanvasFilters'),
     searchInput: document.getElementById('searchInput'),
+    searchButton: document.getElementById('searchButton'),
 };
 
 async function apiRequest(endpoint, options = {}) {
@@ -170,9 +171,59 @@ async function loadCharacters(filter, page, categories, searchQuery = '') {
 
 function validateSearchQuery(query) {
     if (!query) return '';
-    if (query.length > 20) return null;
-    if (!/^[a-zA-Zа-яА-ЯёЁ0-9\s]+$/.test(query)) return null;
+    if (query.length > 20) {
+        window.Telegram.WebApp.showAlert('Куда?! Ты что собрался искать на 20 символов ?');
+        return null;
+    }
+    if (!/^[a-zA-Zа-яА-ЯёЁ0-9\s]+$/.test(query)) {
+        window.Telegram.WebApp.showAlert('Не, такое не работает тут. Давай не выпендривайся хацкер :)');
+        return null;
+    }
     return query.trim();
+}
+
+function performSearch() {
+    const query = DOM.searchInput.value;
+    const validQuery = validateSearchQuery(query);
+    
+    if (query && validQuery === null) {
+        DOM.searchInput.classList.add('is-invalid');
+        return;
+    }
+    
+    DOM.searchInput.classList.remove('is-invalid');
+    loadCharacters(currentFilter, 1, selectedCategories, validQuery || '');
+}
+
+function handleSearchFocus() {
+    DOM.searchInput.classList.add('active');
+    if (DOM.searchButton) {
+        DOM.searchButton.style.display = 'block';
+    }
+}
+
+function handleSearchBlur(event) {
+    // Проверяем, был ли клик по кнопке поиска
+    if (event.relatedTarget === DOM.searchButton) {
+        return;
+    }
+    
+    setTimeout(() => {
+        if (!DOM.searchInput.value.trim()) {
+            DOM.searchInput.classList.remove('active');
+            if (DOM.searchButton) {
+                DOM.searchButton.style.display = 'none';
+            }
+        }
+    }, 200);
+}
+
+function handleSearchKeyPress(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        performSearch();
+        DOM.searchInput.blur();
+    }
 }
 
 function handleSearchInput() {
@@ -432,7 +483,13 @@ function init() {
     DOM.cardsContainer.addEventListener('click', handlePaginationClick);
     
     if (DOM.searchInput) {
-        DOM.searchInput.addEventListener('input', handleSearchInput);
+        DOM.searchInput.addEventListener('focus', handleSearchFocus);
+        DOM.searchInput.addEventListener('blur', handleSearchBlur);
+        DOM.searchInput.addEventListener('keypress', handleSearchKeyPress);
+    }
+    
+    if (DOM.searchButton) {
+        DOM.searchButton.addEventListener('click', performSearch);
     }
     
     initCategoriesScroll();
