@@ -7,6 +7,11 @@ let selectedCategories = [];
 let categoriesLoaded = false;
 let categoriesLoading = false;
 
+let scrollStartX = 0;
+let scrollStartTime = 0;
+let isScrolling = false;
+
+
 const DOM = {
     cardsContainer: document.querySelector('.cards-container'),
     cardsRow: document.querySelector('.cards-container .row'),
@@ -158,6 +163,56 @@ async function loadCharacters(filter, page, categories) {
     }
 }
 
+function initCategoriesScroll() {
+    const container = document.querySelector('.categories-scroll-container');
+    if (!container) return;
+    
+    let startX, scrollLeft;
+    
+    container.addEventListener('mousedown', (e) => {
+        if (e.target.closest('[data-category]')) {
+            startX = e.pageX;
+            scrollLeft = container.scrollLeft;
+            scrollStartX = e.pageX;
+            scrollStartTime = Date.now();
+            isScrolling = false;
+        }
+    });
+    
+    container.addEventListener('mousemove', (e) => {
+        if (startX !== undefined) {
+            const distance = Math.abs(e.pageX - scrollStartX);
+            if (distance > 5) {
+                isScrolling = true;
+                const walk = (scrollStartX - e.pageX);
+                container.scrollLeft = scrollLeft + walk;
+            }
+        }
+    });
+    
+    container.addEventListener('mouseup', () => {
+        startX = undefined;
+    });
+    
+    container.addEventListener('mouseleave', () => {
+        startX = undefined;
+    });
+    
+    // Для touch устройств
+    container.addEventListener('touchstart', (e) => {
+        scrollStartX = e.touches[0].pageX;
+        scrollStartTime = Date.now();
+        isScrolling = false;
+    });
+    
+    container.addEventListener('touchmove', (e) => {
+        const distance = Math.abs(e.touches[0].pageX - scrollStartX);
+        if (distance > 5) {
+            isScrolling = true;
+        }
+    });
+}
+
 function renderCharacters(characters) {
     clearContainer(DOM.cardsRow);
     if (!characters?.length) {
@@ -290,8 +345,13 @@ function handleFilterClick(event) {
 
 function handleCategoryClick(event) {
     event.preventDefault();
+    if (isScrolling) {
+        isScrolling = false;
+        return;
+    }
     const target = event.target.closest('[data-category]');
-    if (target) toggleCategory(target.dataset.category);
+    if (!target) return;
+    toggleCategory(target.dataset.category);
 }
 
 function handlePaginationClick(event) {
@@ -309,9 +369,10 @@ function handlePaginationClick(event) {
 function init() {
     DOM.filterButtons.forEach(btn => btn.addEventListener('click', handleFilterClick));
     DOM.categories.inline?.addEventListener('click', handleCategoryClick);
-    DOM.categories.dropdownMenu?.addEventListener('click', handleCategoryClick);
     DOM.selectedCategories.wrapper?.addEventListener('click', handleCategoryClick);
     DOM.cardsContainer.addEventListener('click', handlePaginationClick);
+    
+    initCategoriesScroll();
     
     loadCharacters('all', 1, []);
     loadCategories();
