@@ -1,3 +1,5 @@
+// js/main.js - Оптимизированная версия
+
 const API_BASE_URL = 'https://testapi.capyhub.su';
 const PAGE_SIZE = 20;
 
@@ -121,7 +123,7 @@ function renderCategories(categories) {
     clearContainer(DOM.categories.inline);
     clearContainer(DOM.categories.dropdownMenu);
 
-    const maxInline = window.innerWidth < 576 ? 2 : window.innerWidth < 992 ? 4 : 6;
+    const maxInline = window.innerWidth < 576 ? 3 : window.innerWidth < 992 ? 5 : 7;
     const inlineCategories = categories.slice(0, maxInline);
     const dropdownCategories = categories.slice(maxInline);
     
@@ -150,12 +152,15 @@ function createCategoryButton(category, className, tag = 'button') {
     if (tag === 'button') attrs.type = 'button';
     if (tag === 'a') attrs.href = '#';
 
+    const isSelected = selectedCategories.includes(category);
+    const displayText = isSelected ? `✓ ${category}` : category;
+
     const el = createElement(tag, {
         className: className,
-        text: category,
+        text: displayText,
         attributes: attrs,
     });
-    if (selectedCategories.includes(category)) el.classList.add('active');
+    if (isSelected) el.classList.add('active');
     return el;
 }
 
@@ -267,41 +272,17 @@ function renderPagination(current, total) {
     DOM.cardsContainer.appendChild(DOM.paginationWrapper);
 }
 
-function toggleCategory(category) {
-    const index = selectedCategories.indexOf(category);
-    if (index > -1) {
-        selectedCategories.splice(index, 1);
-    } else if (selectedCategories.length < 5) {
-        selectedCategories.push(category);
-    }
-    updateCategoryUI();
-    loadCharacters(currentFilter, 1, selectedCategories);
-}
-
 function updateCategoryUI() {
     document.querySelectorAll('[data-category]').forEach(el => {
-        el.classList.toggle('active', selectedCategories.includes(el.dataset.category));
+        const category = el.dataset.category;
+        const isSelected = selectedCategories.includes(category);
+        
+        el.classList.toggle('active', isSelected);
+        el.textContent = isSelected ? `✓ ${category}` : category;
     });
-    renderSelectedCategories();
+    DOM.selectedCategories.container.style.display = 'none';
 }
 
-function renderSelectedCategories() {
-    if (!DOM.selectedCategories.container) return;
-    clearContainer(DOM.selectedCategories.wrapper);
-    if (selectedCategories.length === 0) {
-        DOM.selectedCategories.container.style.display = 'none';
-        return;
-    }
-
-    DOM.selectedCategories.container.style.display = 'block';
-    const fragment = document.createDocumentFragment();
-    selectedCategories.forEach(category => {
-        const badge = createElement('span', { className: 'selected-category-badge', text: category, attributes: { 'data-category': category } });
-        badge.appendChild(createElement('span', { className: 'remove-icon', text: '×' }));
-        fragment.appendChild(badge);
-    });
-    DOM.selectedCategories.wrapper.appendChild(fragment);
-}
 
 function handleFilterClick(event) {
     const filter = event.currentTarget.dataset.filter;
