@@ -261,6 +261,17 @@ function updateCategoryUI() {
     DOM.selectedCategories.container.style.display = 'none';
 }
 
+function toggleCategory(category) {
+    const index = selectedCategories.indexOf(category);
+    if (index > -1) {
+        selectedCategories.splice(index, 1);
+    } else {
+        selectedCategories.push(category);
+    }
+    
+    updateCategoryUI();
+    loadCharacters(currentFilter, 1, selectedCategories);
+}
 
 function handleFilterClick(event) {
     const filter = event.currentTarget.dataset.filter;
