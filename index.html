@@ -218,20 +218,41 @@
             text-decoration: underline !important;
         }
 
-        .category-inline-btn.active,
-        .dropdown-menu-dark .dropdown-item.active {
-            background-color: #0088cc;
-            border-color: #0088cc;
-            font-weight: 600;
-            transform: scale(1.02);
+        .categories-scroll-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #2a2a2a #1a1a1a;
+            padding-bottom: 8px;
+        }
+
+        .categories-scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .categories-scroll-container::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 3px;
+        }
+
+        .categories-scroll-container::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 3px;
+        }
+
+        .categories-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #3a3a3a;
+        }
+
+        #categories-inline {
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         .category-inline-btn {
-            transition: all 0.3s ease;
-        }
-
-        .category-inline-btn:active {
-            transform: scale(0.98);
+            flex-shrink: 0;
+            white-space: nowrap;
         }
 
         @media (max-width: 576px) {
@@ -242,11 +263,6 @@
             .filter-btn {
                 font-size: 12px;
                 padding: 6px 12px;
-            }
-
-            .category-inline-btn {
-                font-size: 12px;
-                padding: 5px 10px;
             }
         }
 
@@ -338,20 +354,9 @@
                 
                 <!-- Блок категорий -->
                 <div id="categories-section" class="mt-3" style="display: none;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div id="categories-inline" class="d-flex flex-wrap gap-2 flex-grow-1"></div>
-                        <div class="dropdown" id="categories-dropdown" style="display: none;">
-                            <button class="btn-filters dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Ещё
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-dark" id="categories-dropdown-menu" style="background-color: #1a1a1a; border-color: #2a2a2a;">
-                            </ul>
-                        </div>
+                    <div class="categories-scroll-container">
+                        <div id="categories-inline" class="d-flex gap-2"></div>
                     </div>
-                </div>
-                
-                <div id="selected-categories" class="mt-2" style="display: none;">
-                    <div class="d-flex flex-wrap gap-2"></div>
                 </div>
             </div>
         </div>
