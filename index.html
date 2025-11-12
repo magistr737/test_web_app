@@ -248,19 +248,6 @@
             -ms-user-select: none;
         }
 
-        .search-input:focus {
-            background-color: #1a1a1a !important;
-            border-color: #0088cc !important;
-            box-shadow: 0 0 0 0.2rem rgba(0, 136, 204, 0.25) !important;
-            color: #ffffff !important;
-            outline: none !important;
-        }
-
-        .search-input.is-invalid {
-            border-color: #dc3545 !important;
-            background-image: none;
-        }
-
         @media (max-width: 576px) {
             .character-card img {
                 height: 180px;
@@ -355,7 +342,14 @@
                             <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
                         </svg>
                     </button>
-                    <input class="form-control search-input" type="search" id="searchInput" placeholder="Поиск персонажей" aria-label="Search"/>
+                    <div class="input-group flex-grow-1">
+                        <input class="form-control search-input" type="search" id="searchInput" placeholder="Поиск персонажей" aria-label="Search"/>
+                        <button class="btn btn-primary" id="searchButton" type="button" style="display: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Блок категорий -->
@@ -428,6 +422,6 @@
     </script>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
-    <script src="/js/characters.js" defer></script>
+    <script src="js/characters.js" defer></script>
 </body>
 </html>
