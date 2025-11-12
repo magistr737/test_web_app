@@ -248,6 +248,19 @@
             -ms-user-select: none;
         }
 
+        .search-input:focus {
+            background-color: #1a1a1a !important;
+            border-color: #0088cc !important;
+            box-shadow: 0 0 0 0.2rem rgba(0, 136, 204, 0.25) !important;
+            color: #ffffff !important;
+            outline: none !important;
+        }
+
+        .search-input.is-invalid {
+            border-color: #dc3545 !important;
+            background-image: none;
+        }
+
         @media (max-width: 576px) {
             .character-card img {
                 height: 180px;
