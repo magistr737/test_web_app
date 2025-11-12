@@ -223,14 +223,8 @@
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
-            padding: 8px 0;
-            cursor: grab;
-            user-select: none;
+            padding: 2px 0;
             scroll-behavior: smooth;
-        }
-
-        .categories-scroll-container:active {
-            cursor: grabbing;
         }
 
         .categories-scroll-container::-webkit-scrollbar {
@@ -240,7 +234,13 @@
         #categories-inline {
             flex-wrap: nowrap;
             white-space: nowrap;
-            gap: 8px;
+            gap: 4px;
+            padding: 0 4px;
+        }
+
+        .category-inline-btn {
+            flex-shrink: 0;
+            cursor: pointer;
         }
 
         @media (max-width: 576px) {
