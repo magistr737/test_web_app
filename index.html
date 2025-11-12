@@ -218,96 +218,20 @@
             text-decoration: underline !important;
         }
 
-        /* Стили для выбранных категорий */
-        #selected-categories {
-            font-size: 14px;
-        }
-
-        .selected-category-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background-color: rgba(0, 136, 204, 0.2);
-            border: 1px solid rgba(0, 136, 204, 0.3);
-            border-radius: 20px;
-            color: #ffffff;
-            font-size: 13px;
-        }
-
-        .selected-category-badge .remove-icon {
-            cursor: pointer;
-            font-size: 16px;
-            line-height: 1;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .selected-category-badge .remove-icon:hover {
-            opacity: 1;
-        }
-
-        /* Анимация загрузки */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(26, 26, 26, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            border-radius: 8px;
-        }
-
-        .spinner-border-custom {
-            width: 3rem;
-            height: 3rem;
-            border: 0.3em solid rgba(0, 136, 204, 0.2);
-            border-right-color: #0088cc;
-            border-radius: 50%;
-            animation: spinner-border 0.75s linear infinite;
-        }
-
-        .dropdown-menu-dark .dropdown-item {
-            color: #ffffff;
-            font-size: 14px;
-        }
-
-        .dropdown-menu-dark .dropdown-item:hover {
-            background-color: #2a2a2a;
-        }
-
+        .category-inline-btn.active,
         .dropdown-menu-dark .dropdown-item.active {
             background-color: #0088cc;
+            border-color: #0088cc;
+            font-weight: 600;
+            transform: scale(1.02);
         }
 
         .category-inline-btn {
-            background-color: #1a1a1a;
-            color: #ffffff;
-            border: 1px solid #2a2a2a;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            transition: all 0.3s;
-            cursor: pointer;
-            white-space: nowrap;
+            transition: all 0.3s ease;
         }
 
-        .category-inline-btn:hover {
-            background-color: #2a2a2a;
-            border-color: #3a3a3a;
-        }
-
-        .category-inline-btn.active {
-            background-color: #0088cc;
-            border-color: #0088cc;
-        }
-
-        @keyframes spinner-border {
-            to { transform: rotate(360deg); }
+        .category-inline-btn:active {
+            transform: scale(0.98);
         }
 
         @media (max-width: 576px) {
