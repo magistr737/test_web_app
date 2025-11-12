@@ -218,6 +218,63 @@
             text-decoration: underline !important;
         }
 
+        /* Стили для выбранных категорий */
+        #selected-categories {
+            font-size: 14px;
+        }
+
+        .selected-category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background-color: rgba(0, 136, 204, 0.2);
+            border: 1px solid rgba(0, 136, 204, 0.3);
+            border-radius: 20px;
+            color: #ffffff;
+            font-size: 13px;
+        }
+
+        .selected-category-badge .remove-icon {
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .selected-category-badge .remove-icon:hover {
+            opacity: 1;
+        }
+
+        /* Анимация загрузки */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(26, 26, 26, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 8px;
+        }
+
+        .spinner-border-custom {
+            width: 3rem;
+            height: 3rem;
+            border: 0.3em solid rgba(0, 136, 204, 0.2);
+            border-right-color: #0088cc;
+            border-radius: 50%;
+            animation: spinner-border 0.75s linear infinite;
+        }
+
+        @keyframes spinner-border {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 576px) {
             .character-card img {
                 height: 180px;
@@ -313,6 +370,9 @@
                         </svg>
                     </button>
                     <input class="form-control search-input" type="search" id="searchInput" placeholder="Поиск персонажей" aria-label="Search"/>
+                </div>
+                <div id="selected-categories" class="mt-2" style="display: none;">
+                    <div class="d-flex flex-wrap gap-2"></div>
                 </div>
             </div>
         </div>
