@@ -1,5 +1,3 @@
-// js/main.js - Оптимизированная версия
-
 const API_BASE_URL = 'https://testapi.capyhub.su';
 const PAGE_SIZE = 20;
 
@@ -16,8 +14,6 @@ const DOM = {
     categories: {
         section: document.getElementById('categories-section'),
         inline: document.getElementById('categories-inline'),
-        dropdown: document.getElementById('categories-dropdown'),
-        dropdownMenu: document.getElementById('categories-dropdown-menu'),
     },
     selectedCategories: {
         container: document.querySelector('#selected-categories'),
@@ -121,30 +117,12 @@ function renderCategories(categories) {
     DOM.categories.section.style.display = 'block';
 
     clearContainer(DOM.categories.inline);
-    clearContainer(DOM.categories.dropdownMenu);
 
-    const maxInline = window.innerWidth < 576 ? 3 : window.innerWidth < 992 ? 5 : 7;
-    const inlineCategories = categories.slice(0, maxInline);
-    const dropdownCategories = categories.slice(maxInline);
-    
-    const inlineFragment = document.createDocumentFragment();
-    inlineCategories.forEach(category => {
-        inlineFragment.appendChild(createCategoryButton(category, 'category-inline-btn'));
+    const fragment = document.createDocumentFragment();
+    categories.forEach(category => {
+        fragment.appendChild(createCategoryButton(category, 'category-inline-btn filter-btn'));
     });
-    DOM.categories.inline.appendChild(inlineFragment);
-
-    if (dropdownCategories.length > 0) {
-        DOM.categories.dropdown.style.display = 'block';
-        const dropdownFragment = document.createDocumentFragment();
-        dropdownCategories.forEach(category => {
-            const li = createElement('li');
-            li.appendChild(createCategoryButton(category, 'dropdown-item', 'a'));
-            dropdownFragment.appendChild(li);
-        });
-        DOM.categories.dropdownMenu.appendChild(dropdownFragment);
-    } else {
-        DOM.categories.dropdown.style.display = 'none';
-    }
+    DOM.categories.inline.appendChild(fragment);
 }
 
 function createCategoryButton(category, className, tag = 'button') {
