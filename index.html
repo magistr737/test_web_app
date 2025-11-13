@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,36 +29,15 @@
             color: #ffffff !important;
             font-weight: 600;
         }
-
-        .navbar-toggler {
-            border-color: #2a2a2a;
-        }
-
-        .navbar-toggler-icon {
-            filter: invert(1);
-        }
-
+        
         .offcanvas {
             background-color: #1a1a1a !important;
-            color: #ffffff;
         }
 
         .offcanvas-header {
             border-bottom: 1px solid #2a2a2a;
         }
-
-        .offcanvas-title {
-            color: #ffffff;
-        }
-
-        .btn-close {
-            filter: invert(1);
-        }
-
-        .nav-link {
-            color: #ffffff !important;
-        }
-
+        
         .nav-link:hover {
             color: #0088cc !important;
         }
@@ -90,38 +69,14 @@
             background-color: #2a2a2a;
             border-color: #3a3a3a;
         }
-
-        .search-input {
-            background-color: #1a1a1a !important;
-            border: 1px solid #2a2a2a !important;
-            color: #ffffff !important;
-            border-radius: 8px;
-            padding: 8px 16px;
-            height: 38px;
-        }
-
-        .search-input::placeholder {
-            color: #6a6a6a;
-        }
-
-        .search-input:focus {
-            background-color: #1a1a1a !important;
-            border-color: #0088cc !important;
-            box-shadow: 0 0 0 0.2rem rgba(0, 136, 204, 0.25) !important;
-            color: #ffffff !important;
-        }
-
-        .offcanvas-body .d-grid {
-            padding: 0;
-        }
-
+        
         .offcanvas-body .filter-btn {
             margin: 0;
             border-radius: 8px;
             text-align: left;
             justify-content: flex-start;
         }
-
+        
         .filter-btn {
             background-color: #1a1a1a;
             color: #ffffff;
@@ -132,7 +87,7 @@
             font-size: 14px;
             transition: all 0.3s;
         }
-
+        
         .filter-btn:hover {
             background-color: #2a2a2a;
             border-color: #3a3a3a;
@@ -142,18 +97,6 @@
             background-color: #0088cc;
             border-color: #0088cc;
             color: #ffffff;
-        }
-
-        .container-fluid {
-            max-width: 100%;
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        .cards-container {
-            margin-top: 20px;
-            padding-left: 0;
-            padding-right: 0;
         }
 
         .character-card {
@@ -186,31 +129,13 @@
             margin-bottom: 8px;
             color: #ffffff;
         }
-
-        .character-badge {
-            display: inline-block;
-            font-size: 11px;
+        
+        .badge-category {
+            background-color: #0088cc;
+            color: #ffffff;
+            font-size: 12px;
             padding: 4px 10px;
-            border-radius: 12px;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-
-        .badge-started {
-            background-color: #28a745;
-        }
-
-        .badge-created {
-            background-color: #6f42c1;
-        }
-
-        .badge-imported {
-            background-color: #fd7e14;
-        }
-
-        .offcanvas-footer {
-            padding: 15px;
-            margin-top: auto;
+            border-radius: 6px;
         }
 
         .offcanvas-footer a:hover {
@@ -236,7 +161,6 @@
             flex-wrap: nowrap;
             white-space: nowrap;
             gap: 4px;
-            padding: 0 4px;
         }
 
         .category-inline-btn {
@@ -252,41 +176,20 @@
             .character-card img {
                 height: 180px;
             }
-            
-            .filter-btn {
-                font-size: 12px;
-                padding: 6px 12px;
-            }
         }
-
-        /* Адаптация для планшетов */
         @media (min-width: 768px) and (max-width: 991px) {
             .character-card img {
                 height: 220px;
             }
         }
-
-        /* Адаптация для десктопа */
         @media (min-width: 992px) {
             .character-card img {
                 height: 250px;
-            }
-            
-            .container.cards-container {
-                max-width: 1200px;
-            }
-        }
-
-        /* Адаптация для больших экранов */
-        @media (min-width: 1400px) {
-            .container.cards-container {
-                max-width: 1400px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar с бургер-меню -->
     <nav class="navbar fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">🎭 Персонажи</a>
@@ -298,8 +201,9 @@
                     <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Меню</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
-                <div class="offcanvas-body">
-                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <div class="offcanvas-body d-flex flex-column">
+                    <!-- Убрали класс flex-grow-1 отсюда -->
+                    <ul class="navbar-nav justify-content-end pe-3">
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="#">🏠 Главная</a>
                         </li>
@@ -314,9 +218,9 @@
                         </li>
                     </ul>
                     
-                    <!-- Footer в offcanvas -->
-                    <div class="offcanvas-footer mt-auto pt-3 border-top" style="border-color: #2a2a2a !important;">
-                        <div class="text-center small" style="color: #6a6a6a;">
+                    <!-- Убрали класс mt-auto отсюда -->
+                    <div class="offcanvas-footer pt-3 border-top" style="border-color: #2a2a2a !important;">
+                        <div class="text-center small text-secondary">
                             <p class="mb-2">© 2025 RolePlay AI Bot</p>
                             <p class="mb-2">Все права защищены</p>
                             <p class="mb-0">
@@ -338,21 +242,19 @@
             <div class="container-fluid">
                 <div class="d-flex align-items-center gap-2">
                     <button class="btn-filters" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasFilters" aria-controls="offcanvasFilters">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <svg xmlns="http://www.w000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                             <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
                         </svg>
                     </button>
-                    <div class="input-group flex-grow-1">
-                        <input class="form-control search-input" type="search" id="searchInput" placeholder="Поиск персонажей" aria-label="Search"/>
-                        <button class="btn btn-primary" id="searchButton" type="button" style="display: none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                            </svg>
+                    <div class="input-group">
+                        <input class="form-control" type="text" id="searchInput" placeholder="Поиск персонажей" aria-label="Search"/>
+                        <button id="clearSearchButton" type="button" class="btn-close" aria-label="Clear search" 
+                                style="display: none; position: absolute; top: 50%; right: 90px; transform: translateY(-50%); z-index: 5;">
                         </button>
+                        <button class="btn btn-primary" id="searchButton" type="submit">Поиск</button>
                     </div>
                 </div>
                 
-                <!-- Блок категорий -->
                 <div id="categories-section" class="mt-3" style="display: none;">
                     <div class="categories-scroll-container">
                         <div id="categories-inline" class="d-flex"></div>
@@ -361,7 +263,6 @@
             </div>
         </div>
 
-        <!-- Offcanvas для фильтров -->
         <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasFilters" aria-labelledby="offcanvasFiltersLabel">
             <div class="offcanvas-header">
                 <h5 class="offcanvas-title" id="offcanvasFiltersLabel">Фильтры</h5>
@@ -369,17 +270,16 @@
             </div>
             <div class="offcanvas-body">
                 <div class="d-grid gap-2">
-                    <button class="filter-btn active" data-filter="all">Все</button>
-                    <button class="filter-btn" data-filter="favorite">⭐ Избранное</button>
-                    <button class="filter-btn" data-filter="created">👤 Созданные мной</button>
-                    <button class="filter-btn" data-filter="selected">💬 Начатые</button>
-                    <button class="filter-btn" data-filter="imported">🔗 Импортированные</button>
-                    </div>
+                    <button class="btn filter-btn active" data-filter="all">Все</button>
+                    <button class="btn filter-btn" data-filter="favorite">⭐ Избранное</button>
+                    <button class="btn filter-btn" data-filter="created">👤 Созданные мной</button>
+                    <button class="btn filter-btn" data-filter="selected">💬 Начатые</button>
+                    <button class="btn filter-btn" data-filter="imported">🔗 Импортированные</button>
                 </div>
             </div>
         </div>
 
-        <div class="container-fluid cards-container">
+        <div class="container-fluid cards-container mt-4">
             <div class="container">
                 <div class="row g-3">
                 </div>
@@ -388,7 +288,6 @@
     </div>
 
     <script>
-        // Инициализация Telegram WebApp
         let tg = window.Telegram.WebApp;
         tg.expand();
 
@@ -422,6 +321,6 @@
     </script>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
-    <script src="js/characters.js" defer></script>
+    <script src="/js/characters.js" defer></script>
 </body>
 </html>
