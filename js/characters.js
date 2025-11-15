@@ -2,7 +2,6 @@ class ApiService {
     constructor(baseUrl) {
         this.baseUrl = baseUrl;
         this.baseHeaders = {
-            'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData,
             'Cache-Control': 'no-cache, no-store, must-revalidate',
         };
     }
@@ -11,6 +10,7 @@ class ApiService {
         const url = `${this.baseUrl}${endpoint}`;
         const headers = {
             ...this.baseHeaders,
+            'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData,
             ...options.headers,
         };
 
@@ -52,19 +52,13 @@ class UI {
             cardsContainer: document.querySelector('.cards-container'),
             cardsRow: document.querySelector('.cards-container .row'),
             categories: {
-                section: document.getElementById('categories-section'),
-                inline: document.getElementById('categories-inline'),
-            },
-            selectedCategories: {
-                container: document.querySelector('#selected-categories'),
-                wrapper: document.querySelector('#selected-categories .d-flex'),
+                modalContainer: document.getElementById('tags-modal-container'),
             },
             filterButtons: document.querySelectorAll('.filter-btn[data-filter]'),
             offcanvasFilters: document.getElementById('offcanvasFilters'),
             searchInput: document.getElementById('searchInput'),
             searchButton: document.getElementById('searchButton'),
             clearSearchButton: document.getElementById('clearSearchButton'),
-            categoriesScrollContainer: document.querySelector('.categories-scroll-container'),
         };
     }
 
@@ -111,14 +105,13 @@ class UI {
     }
 
     renderCategories(categories, selectedCategories) {
-        if (!this.dom.categories.section) return;
-        this.dom.categories.section.style.display = 'block';
-        this.clearContainer(this.dom.categories.inline);
+        if (!this.dom.categories.modalContainer) return;
+        this.clearContainer(this.dom.categories.modalContainer);
         const fragment = document.createDocumentFragment();
         categories.forEach(category => {
-            fragment.appendChild(this._createCategoryButton(category, selectedCategories, 'category-inline-btn filter-btn'));
+            fragment.appendChild(this._createCategoryBadge(category, selectedCategories));
         });
-        this.dom.categories.inline.appendChild(fragment);
+        this.dom.categories.modalContainer.appendChild(fragment);
     }
     
     renderPagination(current, total) {
@@ -211,10 +204,6 @@ class UI {
             el.classList.toggle('active', isSelected);
             el.textContent = isSelected ? `${category} ×` : category;
         });
-        
-        if (this.dom.selectedCategories.container) {
-            this.dom.selectedCategories.container.style.display = 'none';
-        }
     }
 
     updateFilterButtons(currentFilter) {
@@ -239,45 +228,6 @@ class UI {
             this.dom.clearSearchButton.style.display = show ? 'block' : 'none';
         }
     }
-    
-    initCategoriesScroll() {
-        const container = this.dom.categoriesScrollContainer;
-        if (!container) return;
-        
-        let startX, scrollLeft;
-        let isDragging = false, hasMoved = false, touchStartX = 0, touchHasMoved = false;
-
-        const startDrag = (e) => {
-            isDragging = true; hasMoved = false;
-            startX = e.pageX - container.offsetLeft;
-            scrollLeft = container.scrollLeft;
-            container.style.cursor = 'grabbing'; container.style.userSelect = 'none'; container.style.scrollBehavior = 'auto';
-        };
-        const moveDrag = (e) => {
-            if (!isDragging) return; e.preventDefault();
-            const x = e.pageX - container.offsetLeft;
-            const walk = (x - startX);
-            if (Math.abs(walk) > 5) hasMoved = true;
-            requestAnimationFrame(() => { container.scrollLeft = scrollLeft - walk; });
-        };
-        const endDrag = () => {
-            isDragging = false; container.style.cursor = 'grab'; container.style.userSelect = '';
-            setTimeout(() => { hasMoved = false; }, 50);
-        };
-        
-        container.addEventListener('mousedown', startDrag);
-        container.addEventListener('mousemove', moveDrag);
-        container.addEventListener('mouseup', endDrag);
-        container.addEventListener('mouseleave', endDrag);
-        
-        container.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].pageX; touchHasMoved = false; });
-        container.addEventListener('touchmove', (e) => { if (Math.abs(e.touches[0].pageX - touchStartX) > 5) touchHasMoved = true; });
-        container.addEventListener('touchend', () => { setTimeout(() => { touchHasMoved = false; }, 50); });
-        
-        container.style.cursor = 'grab';
-        container._hasMoved = () => hasMoved;
-        container._touchHasMoved = () => touchHasMoved;
-    }
 
     _createCharacterCard(char) {
         const col = this.createElement('div', { className: 'col-12 col-md-6 col-lg-4' }); 
@@ -301,14 +251,12 @@ class UI {
         return col;
     }
 
-    _createCategoryButton(category, selectedCategories, className, tag = 'button') {
+    _createCategoryBadge(category, selectedCategories) {
         const isSelected = selectedCategories.includes(category);
-        const attrs = { 'data-category': category };
-        if (tag === 'button') attrs.type = 'button';
-        if (tag === 'a') attrs.href = '#';
+        const attrs = { 'data-category': category, 'role': 'button' };
 
-        const el = this.createElement(tag, {
-            className: className,
+        const el = this.createElement('span', {
+            className: 'tag-badge',
             text: isSelected ? `${category} ×` : category,
             attributes: attrs,
         });
@@ -342,15 +290,13 @@ class App {
     init() {
         this.ui.bindDOM();
         this._bindEvents();
-        this.ui.initCategoriesScroll();
         this.loadCharacters();
         this.loadCategories();
     }
 
     _bindEvents() {
         this.ui.dom.filterButtons.forEach(btn => btn.addEventListener('click', this.handleFilterClick.bind(this)));
-        this.ui.dom.categories.inline?.addEventListener('click', this.handleCategoryClick.bind(this));
-        this.ui.dom.selectedCategories.wrapper?.addEventListener('click', this.handleCategoryClick.bind(this));
+        this.ui.dom.categories.modalContainer?.addEventListener('click', this.handleCategoryClick.bind(this));
         this.ui.dom.cardsContainer.addEventListener('click', this.handlePaginationClick.bind(this));
 
         if (this.ui.dom.searchInput) {
@@ -426,12 +372,7 @@ class App {
     }
 
     handleCategoryClick(event) {
-        event.preventDefault();
-        
-        const container = this.ui.dom.categoriesScrollContainer;
-        if (container && (container._hasMoved?.() || container._touchHasMoved?.())) {
-            return;
-        }
+        event.preventDefault()
         
         const target = event.target.closest('[data-category]');
         if (!target) return;
