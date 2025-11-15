@@ -792,19 +792,18 @@ class App {
             const characterData = await this.api.fetchCharacterDetail(characterId);
             this.ui.renderCharacterModal(characterData, null, null, null);
 
-            try {
-                const [statsData, reactionData, likesCountData] = await Promise.all([
-                    this.api.fetchCharacterStats(characterId),
-                    this.api.fetchReactionStatus(characterId),
-                    this.api.fetchLikesCount(characterId)
-                ]);
-            } catch (error) {
+            const [statsData, reactionData, likesCountData] = await Promise.all([
+                this.api.fetchCharacterStats(characterId),
+                this.api.fetchReactionStatus(characterId),
+                this.api.fetchLikesCount(characterId)
+            ]).catch(error => {
                 console.log('Err Promise.all modal:', error);
-            }
+                return [null, null, null];
+            });
 
-            this.ui.updateCharacterStats(statsData);
-            this.ui.updateReactionButtons(reactionData);
-            this.ui.updateLikesCounts(likesCountData);
+            if (statsData) this.ui.updateCharacterStats(statsData);
+            if (reactionData) this.ui.updateReactionButtons(reactionData);
+            if (likesCountData) this.ui.updateLikesCounts(likesCountData);
             
         } catch (error) {
             console.error('Ошибка загрузки информации о персонаже:', error);
