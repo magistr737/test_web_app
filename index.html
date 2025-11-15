@@ -113,12 +113,6 @@
             box-shadow: 0 8px 16px rgba(0, 136, 204, 0.3);
         }
 
-        .character-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
         .character-card .card-body {
             padding: 15px;
         }
@@ -143,49 +137,18 @@
             text-decoration: underline !important;
         }
 
-        .categories-scroll-container {
-            overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            padding: 1px 0;
-            scroll-behavior: smooth;
-            user-select: none;
-        }
-
-        .categories-scroll-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        #categories-inline {
-            flex-wrap: nowrap;
-            white-space: nowrap;
-            gap: 4px;
-        }
-
-        .category-inline-btn {
-            flex-shrink: 0;
+        .tag-badge {
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            padding: 5px 12px;
+            font-size: 14px;
+            border-radius: 16px;
             cursor: pointer;
+            transition: background-color 0.2s;
             user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
         }
-
-        @media (max-width: 576px) {
-            .character-card img {
-                height: 180px;
-            }
-        }
-        @media (min-width: 768px) and (max-width: 991px) {
-            .character-card img {
-                height: 220px;
-            }
-        }
-        @media (min-width: 992px) {
-            .character-card img {
-                height: 250px;
-            }
+        .tag-badge:hover:not(.bg-primary) {
+            background-color: #3a3a3a;
         }
     </style>
 </head>
@@ -255,10 +218,19 @@
                     </div>
                 </div>
                 
-                <div id="categories-section" class="mt-3" style="display: none;">
-                    <div class="categories-scroll-container">
-                        <div id="categories-inline" class="d-flex"></div>
+                <div class="d-flex gap-2 mt-3">
+                    <div class="dropdown">
+                        <button class="btn filter-btn dropdown-toggle" type="button" id="dropdownTopButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            Топ
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownTopButton">
+                            <li><a class="dropdown-item" href="#">Топ</a></li>
+                            <li><a class="dropdown-item" href="#">АнтиТоп</a></li>
+                        </ul>
                     </div>
+                    <button type="button" class="btn filter-btn" data-bs-toggle="modal" data-bs-target="#tagsModal">
+                        Все теги
+                    </button>
                 </div>
             </div>
         </div>
@@ -287,9 +259,29 @@
         </div>
     </div>
 
+    <div class="modal fade" id="tagsModal" tabindex="-1" aria-labelledby="tagsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: #1a1a1a; border-color: #2a2a2a;">
+                <div class="modal-header" style="border-bottom-color: #2a2a2a;">
+                    <h5 class="modal-title" id="tagsModalLabel">Все теги</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="tags-modal-container" class="d-flex flex-wrap gap-2">
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top-color: #2a2a2a;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+
+        //(function(){'use strict';const a='https://testapi.capyhub.su/v1/ping',b=10000,c=()=>{const e=document.createElement('div');return e.id='api-loader',e.className='d-flex justify-content-center align-items-center',e.style.cssText='position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #121212; z-index: 9999;',e.innerHTML='<div class="text-center"><div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"><span class="visually-hidden">Загрузка...</span></div><p class="mt-3 text-light">Подключение к серверу...</p></div>',e},d=()=>{const e=document.createElement('div');return e.className='d-flex justify-content-center align-items-center',e.style.cssText='position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #121212; z-index: 9999;',e.innerHTML='<div class="text-center"><div class="text-danger mb-3"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16"><path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/><path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/></svg></div><h5 class="text-light">Не удалось подключиться к серверу</h5><p class="text-secondary">Пожалуйста, проверьте подключение к интернету</p><button class="btn btn-primary mt-3" id="retry-button">Повторить попытку</button></div>',e},f=()=>{const e=new AbortController,g=setTimeout(()=>e.abort(),b),initData=tg?.initData;return fetch(a,{method:'GET',signal:e.signal,headers:{'Accept':'application/json','X-Telegram-Init-Data':initData}}).then(h=>{if(clearTimeout(g),!h.ok)throw new Error(`HTTP error! status: ${h.status}`);return h.json()}).then(h=>{if(h&&h.message==='pong')return!0;throw new Error('Invalid API response')}).catch(h=>{throw clearTimeout(g),console.error('API check failed:',h.name,h.message),h})},i=()=>{document.body.style.visibility='hidden';const e=c();document.body.appendChild(e),f().then(()=>{e.remove(),document.body.style.visibility='visible'}).catch(()=>{e.remove();const g=d();document.body.appendChild(g);const h=g.querySelector('#retry-button');h&&h.addEventListener('click',()=>{g.remove(),i()})})};document.readyState==='loading'?document.addEventListener('DOMContentLoaded',i):i()})();
 
         const placeholders = ['Поиск: walter white', 'Поиск: genshin impact', 'Поиск: годжо сатору', 'Поиск: капибары'];
         let currentIndex = 0;
@@ -320,7 +312,6 @@
         updateYear();
     </script>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
     <script src="/js/characters.js" defer></script>
 </body>
 </html>
