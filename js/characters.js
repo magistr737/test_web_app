@@ -45,6 +45,52 @@ class ApiService {
     fetchPhoto(fileId) {
         return this.request(`/v1/characters/photo?file_id=${fileId}`);
     }
+
+    fetchCharacterDetail(publicId) {
+        return this.request(`/v1/characters/${publicId}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
+    }
+
+    fetchCharacterStats(publicId) {
+        return this.request(`/v1/characters/stats?public_id=${publicId}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
+    }
+
+    fetchReactionStatus(publicId) {
+        return this.request(`/v1/characters/reactions/status/${publicId}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
+    }
+
+    setLike(publicId) {
+        return this.request('/v1/characters/reactions/like', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            },
+            body: JSON.stringify({ public_id: publicId })
+        });
+    }
+
+    setDislike(publicId) {
+        return this.request('/v1/characters/reactions/dislike', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            },
+            body: JSON.stringify({ public_id: publicId })
+        });
+    }
+
+    fetchLikesCount(publicId) {
+    return this.request(`/v1/characters/reactions/count/${publicId}`, {
+        headers: { 'Cache-Control': 'no-cache' }
+    });
+}
 }
 
 class ImageLoader {
@@ -139,6 +185,20 @@ class UI {
             searchInput: document.getElementById('searchInput'),
             searchButton: document.getElementById('searchButton'),
             clearSearchButton: document.getElementById('clearSearchButton'),
+            characterModal: {
+                element: document.getElementById('characterInfoModal'),
+                image: document.getElementById('char-modal-image'),
+                name: document.getElementById('char-modal-name'),
+                description: document.getElementById('char-modal-description'),
+                tags: document.getElementById('char-modal-tags'),
+                favoritesCount: document.getElementById('char-favorites-count'),
+                chatsCount: document.getElementById('char-chats-count'),
+                likesCount: document.getElementById('char-likes-count'),
+                dislikesCount: document.getElementById('char-dislikes-count'),
+                favoriteBtn: document.getElementById('char-favorite-btn'),
+                likeBtn: document.getElementById('char-like-btn'),
+                dislikeBtn: document.getElementById('char-dislike-btn'),
+            },
         };
     }
 
@@ -324,7 +384,14 @@ class UI {
 
     _createCharacterCard(char) {
         const col = this.createElement('div', { className: 'col-12 col-md-6 col-lg-4' });
-        const card = this.createElement('div', { className: 'character-card', attributes: { 'data-character-id': char.id } });
+        const card = this.createElement('div', { 
+            className: 'character-card', 
+            attributes: { 
+                'data-character-id': char.public_id,
+                'data-bs-toggle': 'modal',
+                'data-bs-target': '#characterInfoModal'
+            } 
+        });
         
         const img = this.createElement('img', {
             className: 'card-img-top img-fluid',
@@ -371,6 +438,119 @@ class UI {
         if (isSelected) el.classList.add('active');
         return el;
     }
+
+    renderCharacterModal(character, stats = null, reactionStatus = null, likesCount = null) {
+        const modal = this.dom.characterModal;
+        
+        modal.name.textContent = character.name;
+        modal.description.textContent = character.description || 'Описание отсутствует';
+        
+        if (character.file_id && this.imageLoader) {
+            modal.image.src = '';
+            modal.image.classList.add('placeholder', 'bg-secondary');
+            this.imageLoader.addToQueue(character.file_id, modal.image);
+        }
+        
+        this.clearContainer(modal.tags);
+        if (character.tags && Array.isArray(character.tags)) {
+            character.tags.forEach(tag => {
+                modal.tags.appendChild(this.createElement('span', {
+                    className: 'badge bg-primary rounded-pill me-1 mb-1',
+                    text: tag
+                }));
+            });
+        }
+        
+        modal.favoritesCount.parentElement.setAttribute('aria-hidden', 'true');
+        modal.favoritesCount.classList.add('placeholder');
+        modal.chatsCount.parentElement.setAttribute('aria-hidden', 'true');
+        modal.chatsCount.classList.add('placeholder');
+        modal.likesCount.parentElement.setAttribute('aria-hidden', 'true');
+        modal.likesCount.classList.add('placeholder');
+        modal.dislikesCount.parentElement.setAttribute('aria-hidden', 'true');
+        modal.dislikesCount.classList.add('placeholder');
+        
+        modal.likeBtn.setAttribute('aria-hidden', 'true');
+        modal.likeBtn.classList.add('disabled', 'placeholder');
+        modal.dislikeBtn.setAttribute('aria-hidden', 'true');
+        modal.dislikeBtn.classList.add('disabled', 'placeholder');
+        
+        if (stats) {
+            this.updateCharacterStats(stats);
+        }
+        
+        if (likesCount) {
+            this.updateLikesCounts(likesCount);
+        }
+        
+        if (character.is_favorite) {
+            modal.favoriteBtn.classList.remove('btn-outline-warning');
+            modal.favoriteBtn.classList.add('btn-warning');
+            modal.favoriteBtn.innerHTML = '<i class="bi bi-star-fill"></i> В избранном';
+        } else {
+            modal.favoriteBtn.classList.remove('btn-warning');
+            modal.favoriteBtn.classList.add('btn-outline-warning');
+            modal.favoriteBtn.innerHTML = '<i class="bi bi-star"></i> Добавить в избранное';
+        }
+        
+        if (reactionStatus) {
+            this.updateReactionButtons(reactionStatus);
+        }
+        
+        modal.element.dataset.currentCharacterId = character.public_id;
+    }
+
+    updateCharacterStats(stats) {
+        const modal = this.dom.characterModal;
+        
+        modal.favoritesCount.parentElement.removeAttribute('aria-hidden');
+        modal.favoritesCount.classList.remove('placeholder');
+        modal.favoritesCount.textContent = stats.favorites_count || 0;
+        
+        modal.chatsCount.parentElement.removeAttribute('aria-hidden');
+        modal.chatsCount.classList.remove('placeholder');
+        modal.chatsCount.textContent = stats.selected_count || 0;
+    }
+
+    updateLikesCounts(likesCount) {
+        const modal = this.dom.characterModal;
+        
+        modal.likesCount.parentElement.removeAttribute('aria-hidden');
+        modal.likesCount.classList.remove('placeholder');
+        modal.likesCount.textContent = likesCount.likes_count || 0;
+        
+        modal.dislikesCount.parentElement.removeAttribute('aria-hidden');
+        modal.dislikesCount.classList.remove('placeholder');
+        modal.dislikesCount.textContent = likesCount.dislikes_count || 0;
+    }
+
+    updateReactionButtons(reactionStatus) {
+        const modal = this.dom.characterModal;
+        
+        // Убираем placeholder'ы с кнопок
+        modal.likeBtn.removeAttribute('aria-hidden');
+        modal.likeBtn.classList.remove('disabled', 'placeholder');
+        modal.dislikeBtn.removeAttribute('aria-hidden');
+        modal.dislikeBtn.classList.remove('disabled', 'placeholder');
+        
+        // Обновляем кнопку лайка
+        if (reactionStatus.is_liked) {
+            modal.likeBtn.classList.remove('btn-outline-success');
+            modal.likeBtn.classList.add('btn-success');
+        } else {
+            modal.likeBtn.classList.remove('btn-success');
+            modal.likeBtn.classList.add('btn-outline-success');
+        }
+        
+        // Обновляем кнопку дизлайка
+        if (reactionStatus.is_disliked) {
+            modal.dislikeBtn.classList.remove('btn-outline-danger');
+            modal.dislikeBtn.classList.add('btn-danger');
+        } else {
+            modal.dislikeBtn.classList.remove('btn-danger');
+            modal.dislikeBtn.classList.add('btn-outline-danger');
+        }
+    }
 }
 
 class App {
@@ -408,6 +588,7 @@ class App {
         this.ui.dom.filterButtons.forEach(btn => btn.addEventListener('click', this.handleFilterClick.bind(this)));
         this.ui.dom.tags.modalContainer?.addEventListener('click', this.handleTagClick.bind(this));
         this.ui.dom.cardsContainer.addEventListener('click', this.handlePaginationClick.bind(this));
+        this.ui.dom.cardsContainer.addEventListener('click', this.handleCharacterCardClick.bind(this));
 
         if (this.ui.dom.searchInput) {
             this.ui.dom.searchInput.addEventListener('focus', this.handleSearchFocus.bind(this));
@@ -421,6 +602,14 @@ class App {
 
         if (this.ui.dom.clearSearchButton) {
             this.ui.dom.clearSearchButton.addEventListener('click', this.resetAndLoad.bind(this));
+        }
+
+        if (this.ui.dom.characterModal.likeBtn) {
+            this.ui.dom.characterModal.likeBtn.addEventListener('click', this.handleLikeClick.bind(this));
+        }
+
+        if (this.ui.dom.characterModal.dislikeBtn) {
+            this.ui.dom.characterModal.dislikeBtn.addEventListener('click', this.handleDislikeClick.bind(this));
         }
     }
 
@@ -590,6 +779,95 @@ class App {
         this.ui.updateTagsUI(this.state.selectedTags);
 
         this.loadCharacters();
+    }
+
+    async handleCharacterCardClick(event) {
+        const card = event.target.closest('.character-card');
+        if (!card) return;
+        
+        const characterId = card.dataset.characterId;
+        if (!characterId) return;
+        
+        try {
+            const characterData = await this.api.fetchCharacterDetail(characterId);
+            this.ui.renderCharacterModal(characterData, null, null, null);
+
+            try {
+                const [statsData, reactionData, likesCountData] = await Promise.all([
+                    this.api.fetchCharacterStats(characterId),
+                    this.api.fetchReactionStatus(characterId),
+                    this.api.fetchLikesCount(characterId)
+                ]);
+            } catch (error) {
+                console.log('Err Promise.all modal:', error);
+            }
+
+            this.ui.updateCharacterStats(statsData);
+            this.ui.updateReactionButtons(reactionData);
+            this.ui.updateLikesCounts(likesCountData);
+            
+        } catch (error) {
+            console.error('Ошибка загрузки информации о персонаже:', error);
+            window.Telegram.WebApp.showAlert('Не удалось загрузить информацию о персонаже');
+        }
+    }
+
+    async handleLikeClick() {
+        const characterId = this.ui.dom.characterModal.element.dataset.currentCharacterId;
+        if (!characterId) return;
+        
+        try {
+            const modal = this.ui.dom.characterModal;
+            const currentLikes = parseInt(modal.likesCount.textContent) || 0;
+            const currentDislikes = parseInt(modal.dislikesCount.textContent) || 0;
+            
+            const wasLiked = modal.likeBtn.classList.contains('btn-success');
+            const wasDisliked = modal.dislikeBtn.classList.contains('btn-danger');
+            
+            const reactionData = await this.api.setLike(characterId);
+            this.ui.updateReactionButtons(reactionData);
+            
+            if (reactionData.is_liked && !wasLiked) {
+                modal.likesCount.textContent = currentLikes + 1;
+                if (wasDisliked) {
+                    modal.dislikesCount.textContent = Math.max(0, currentDislikes - 1);
+                }
+            } else if (!reactionData.is_liked && wasLiked) {
+                modal.likesCount.textContent = Math.max(0, currentLikes - 1);
+            }
+        } catch (error) {
+            console.error('Ошибка при лайке:', error);
+            window.Telegram.WebApp.showAlert('Не удалось поставить лайк');
+        }
+    }
+
+    async handleDislikeClick() {
+        const characterId = this.ui.dom.characterModal.element.dataset.currentCharacterId;
+        if (!characterId) return;
+        
+        try {
+            const modal = this.ui.dom.characterModal;
+            const currentLikes = parseInt(modal.likesCount.textContent) || 0;
+            const currentDislikes = parseInt(modal.dislikesCount.textContent) || 0;
+            
+            const wasLiked = modal.likeBtn.classList.contains('btn-success');
+            const wasDisliked = modal.dislikeBtn.classList.contains('btn-danger');
+            
+            const reactionData = await this.api.setDislike(characterId);
+            this.ui.updateReactionButtons(reactionData);
+            
+            if (reactionData.is_disliked && !wasDisliked) {
+                modal.dislikesCount.textContent = currentDislikes + 1;
+                if (wasLiked) {
+                    modal.likesCount.textContent = Math.max(0, currentLikes - 1);
+                }
+            } else if (!reactionData.is_disliked && wasDisliked) {
+                modal.dislikesCount.textContent = Math.max(0, currentDislikes - 1);
+            }
+        } catch (error) {
+            console.error('Ошибка при дизлайке:', error);
+            window.Telegram.WebApp.showAlert('Не удалось поставить дизлайк');
+        }
     }
 }
 
