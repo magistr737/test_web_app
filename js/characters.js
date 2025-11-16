@@ -87,10 +87,20 @@ class ApiService {
     }
 
     fetchLikesCount(publicId) {
-    return this.request(`/v1/characters/reactions/count/${publicId}`, {
-        headers: { 'Cache-Control': 'no-cache' }
-    });
-}
+        return this.request(`/v1/characters/reactions/count/${publicId}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
+    }
+
+    toggleFavorite(publicId) {
+        return this.request(`/v1/characters/favorite/${publicId}`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            }
+        });
+    }
 }
 
 class ImageLoader {
@@ -509,12 +519,12 @@ class UI {
         
         if (character.is_favorite) {
             modal.favoriteBtn.classList.remove('btn-outline-warning');
-            modal.favoriteBtn.classList.add('btn-warning');
-            modal.favoriteBtn.innerHTML = '<i class="bi bi-star-fill"></i> В избранном';
+            modal.favoriteBtn.classList.add('btn-outline-danger');
+            modal.favoriteBtn.innerHTML = '<i class="bi bi-heart-break-fill"></i> Убрать из избранного';
         } else {
-            modal.favoriteBtn.classList.remove('btn-warning');
+            modal.favoriteBtn.classList.remove('btn-outline-danger');
             modal.favoriteBtn.classList.add('btn-outline-warning');
-            modal.favoriteBtn.innerHTML = '<i class="bi bi-star"></i> Добавить в избранное';
+            modal.favoriteBtn.innerHTML = '<i class="bi bi-star-fill"></i> В избранное';
         }
         
         if (reactionStatus) {
@@ -634,6 +644,10 @@ class App {
 
         if (this.ui.dom.characterModal.dislikeBtn) {
             this.ui.dom.characterModal.dislikeBtn.addEventListener('click', this.handleDislikeClick.bind(this));
+        }
+
+        if (this.ui.dom.characterModal.favoriteBtn) {
+            this.ui.dom.characterModal.favoriteBtn.addEventListener('click', this.handleFavoriteClick.bind(this));
         }
     }
 
@@ -890,6 +904,29 @@ class App {
         } catch (error) {
             console.error('Ошибка при дизлайке:', error);
             window.Telegram.WebApp.showAlert('Не удалось поставить дизлайк');
+        }
+    }
+
+    async handleFavoriteClick() {
+        const characterId = this.ui.dom.characterModal.element.dataset.currentCharacterId;
+        if (!characterId) return;
+        
+        try {
+            const modal = this.ui.dom.characterModal;
+            const favoriteData = await this.api.toggleFavorite(characterId);
+            
+            if (favoriteData.is_favorite) {
+                modal.favoriteBtn.classList.remove('btn-outline-warning');
+                modal.favoriteBtn.classList.add('btn-outline-danger');
+                modal.favoriteBtn.innerHTML = '<i class="bi bi-heart-break-fill"></i> Убрать из избранного';
+            } else {
+                modal.favoriteBtn.classList.remove('btn-outline-danger');
+                modal.favoriteBtn.classList.add('btn-outline-warning');
+                modal.favoriteBtn.innerHTML = '<i class="bi bi-star-fill"></i> В избранное';
+            }
+        } catch (error) {
+            console.error('Ошибка при добавлении/удалении из избранного:', error);
+            window.Telegram.WebApp.showAlert('Не удалось изменить статус избранного');
         }
     }
 }
