@@ -843,7 +843,7 @@ class UI {
         charactersSection.appendChild(charactersHeader);
 
         const createCard = this.createElement('div', { 
-            className: 'card border-0 bg-light'
+            className: 'card border-0 bg-secondary bg-opacity-10'
         });
         const createCardBody = this.createElement('div', {
             className: 'card-body text-center py-4'
