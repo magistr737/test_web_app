@@ -12,7 +12,13 @@ class ApiService {
             ...options.headers,
         };
 
-        const response = await fetch(url, { ...options, headers });
+        const finalOptions = {
+            ...options,
+            headers,
+            cache: 'no-store'
+        };
+
+        const response = await fetch(url, finalOptions);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -20,9 +26,7 @@ class ApiService {
     }
 
     fetchTags() {
-        return this.request('/v1/characters/tags', {
-            headers: { 'Cache-Control': 'no-cache' }
-        });
+        return this.request('/v1/characters/tags');
     }
 
     fetchCharacters(filter, page, pageSize, tags, searchQuery) {
@@ -37,9 +41,7 @@ class ApiService {
         if (searchQuery) {
             params.append('search_query', searchQuery);
         }
-        return this.request(`/v1/characters/list?${params.toString()}`, {
-            headers: { 'Cache-Control': 'no-cache' }
-        });
+        return this.request(`/v1/characters/list?${params.toString()}`);
     }
 
     fetchPhoto(fileId) {
@@ -47,29 +49,22 @@ class ApiService {
     }
 
     fetchCharacterDetail(publicId) {
-        return this.request(`/v1/characters/${publicId}`, {
-            headers: { 'Cache-Control': 'no-cache' }
-        });
+        return this.request(`/v1/characters/${publicId}`);
     }
 
     fetchCharacterStats(publicId) {
-        return this.request(`/v1/characters/stats?public_id=${publicId}`, {
-            headers: { 'Cache-Control': 'no-cache' }
-        });
+        return this.request(`/v1/characters/stats?public_id=${publicId}`);
     }
 
     fetchReactionStatus(publicId) {
-        return this.request(`/v1/characters/reactions/status/${publicId}`, {
-            headers: { 'Cache-Control': 'no-cache' }
-        });
+        return this.request(`/v1/characters/reactions/status/${publicId}`);
     }
 
     setLike(publicId) {
         return this.request('/v1/characters/reactions/like', {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache'
+            headers: {
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ public_id: publicId })
         });
@@ -78,36 +73,28 @@ class ApiService {
     setDislike(publicId) {
         return this.request('/v1/characters/reactions/dislike', {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache'
+            headers: {
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ public_id: publicId })
         });
     }
 
     fetchLikesCount(publicId) {
-        return this.request(`/v1/characters/reactions/count/${publicId}`, {
-            headers: { 'Cache-Control': 'no-cache' }
-        });
+        return this.request(`/v1/characters/reactions/count/${publicId}`);
     }
 
     toggleFavorite(publicId) {
         return this.request(`/v1/characters/favorite/${publicId}`, {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache'
+            headers: {
+                'Content-Type': 'application/json'
             }
         });
     }
 
     fetchSubsData(){
-        return this.request(`/v1/profile/`, {
-            headers: { 
-                'Cache-Control': 'no-cache'
-            }
-        });
+        return this.request(`/v1/profile/`);
     }
 }
 
@@ -570,13 +557,11 @@ class UI {
     updateReactionButtons(reactionStatus) {
         const modal = this.dom.characterModal;
         
-        // Убираем placeholder'ы с кнопок
         modal.likeBtn.removeAttribute('aria-hidden');
         modal.likeBtn.classList.remove('disabled', 'placeholder');
         modal.dislikeBtn.removeAttribute('aria-hidden');
         modal.dislikeBtn.classList.remove('disabled', 'placeholder');
         
-        // Обновляем кнопку лайка
         if (reactionStatus.is_liked) {
             modal.likeBtn.classList.remove('btn-outline-success');
             modal.likeBtn.classList.add('btn-success');
@@ -585,7 +570,6 @@ class UI {
             modal.likeBtn.classList.add('btn-outline-success');
         }
         
-        // Обновляем кнопку дизлайка
         if (reactionStatus.is_disliked) {
             modal.dislikeBtn.classList.remove('btn-outline-danger');
             modal.dislikeBtn.classList.add('btn-danger');
@@ -642,12 +626,10 @@ class UI {
         const col = this.createElement('div', { className: 'col-12' });
         const container = this.createElement('div', { className: 'container py-4' });
         
-        // Основная карточка профиля
         const profileCard = this.createElement('div', { 
             className: 'card border-0 shadow-lg'
         });
         
-        // Шапка с градиентом и информацией о пользователе
         const cardHeader = this.createElement('div', { 
             className: 'card-header border-0 text-white',
             styles: {
@@ -662,7 +644,6 @@ class UI {
             className: 'd-flex align-items-center gap-3'
         });
         
-        // Аватар
         let avatarElement;
         if (userData.photo_url) {
             avatarElement = this.createElement('img', {
@@ -717,13 +698,11 @@ class UI {
         userInfoWrapper.append(avatarElement, userInfo);
         cardHeader.appendChild(userInfoWrapper);
         
-        // Тело карточки
         const cardBody = this.createElement('div', { 
             className: 'card-body',
             styles: { padding: '1.5rem' }
         });
         
-        // Блок подписки
         const subscriptionSection = this.createElement('div', { className: 'mb-3' });
         
         const subscriptionHeader = this.createElement('div', { 
@@ -766,7 +745,6 @@ class UI {
         
         subscriptionSection.appendChild(this.createElement('hr', { className: 'my-3' }));
         
-        // Блок использования запросов
         const requestsSection = this.createElement('div', { className: 'mb-3' });
         
         const requestsHeader = this.createElement('div', { 
@@ -829,7 +807,6 @@ class UI {
         requestsSection.appendChild(remainingText);
         requestsSection.appendChild(this.createElement('hr', { className: 'my-3' }));
         
-        // Блок лимитов персонажей
         const charactersSection = this.createElement('div');
 
         const charactersHeader = this.createElement('div', { 
@@ -850,7 +827,6 @@ class UI {
 
         const charactersRow = this.createElement('div', { className: 'row g-3' });
 
-        // Создание персонажей
         const createCol = this.createElement('div', { className: 'col-6' });
         const createCard = this.createElement('div', { 
             className: 'card border-0 h-100'
@@ -869,7 +845,6 @@ class UI {
         createCard.appendChild(createCardBody);
         createCol.appendChild(createCard);
 
-        // Добавление персонажей
         const addCol = this.createElement('div', { className: 'col-6' });
         const addCard = this.createElement('div', { 
             className: 'card border-0 h-100'
