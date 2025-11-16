@@ -100,6 +100,25 @@ class ImageLoader {
         this.queue = [];
         this.loading = false;
         this.delay = 100;
+        this.observer = null;
+        this.initObserver();
+    }
+
+    initObserver() {
+        this.observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    const fileId = img.dataset.fileId;
+                    if (fileId && !img.classList.contains('loaded')) {
+                        this.addToQueue(fileId, img);
+                        this.observer.unobserve(img);
+                    }
+                }
+            });
+        }, {
+            rootMargin: '50px'
+        });
     }
 
     addToQueue(fileId, imgElement) {
@@ -153,6 +172,11 @@ class ImageLoader {
             imgElement.classList.remove('placeholder', 'bg-secondary');
             imgElement.classList.add('error');
         }
+    }
+
+    observeImage(fileId, imgElement) {
+        imgElement.dataset.fileId = fileId;
+        this.observer.observe(imgElement);
     }
 
     clear() {
@@ -403,7 +427,7 @@ class UI {
         });
 
         if (char.file_id && this.imageLoader) {
-            this.imageLoader.addToQueue(char.file_id, img);
+            this.imageLoader.observeImage(char.file_id, img);
         }
         
         const cardBody = this.createElement('div', { className: 'card-body' });
