@@ -82,10 +82,10 @@
             background-color: #1a1a1a;
             color: #ffffff;
             border: 1px solid #2a2a2a;
-            padding: 8px 16px;
+            padding: 6px 12px;
             margin: 4px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             transition: all 0.3s;
         }
         
@@ -157,7 +157,7 @@
     <nav class="navbar fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">🎭 Персонажи</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+            <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
@@ -166,7 +166,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body d-flex flex-column">
-                    <!-- Убрали класс flex-grow-1 отсюда -->
                     <ul class="navbar-nav justify-content-end pe-3">
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="#">🏠 Главная</a>
@@ -175,14 +174,16 @@
                             <a class="nav-link" href="#">✨ Создать персонажа</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">📥 Импортировать персонажа</a>
+                            <a class="nav-link" href="#">👤 Профиль</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">💎 Тарифы</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showCapybara(event)">🦫 Капибара</a>
+                        </li>
                     </ul>
                     
-                    <!-- Убрали класс mt-auto отсюда -->
                     <div class="offcanvas-footer pt-3 border-top" style="border-color: #2a2a2a !important;">
                         <div class="text-center small text-secondary">
                             <p class="mb-2">© 2025 RolePlay AI Bot</p>
@@ -219,7 +220,7 @@
                     </div>
                 </div>
                 
-                <div class="d-flex gap-2 mt-3">
+                <div class="d-flex gap-2 mt-2">
                     <div class="dropdown">
                         <button class="btn filter-btn dropdown-toggle" type="button" id="dropdownTopButton" data-bs-toggle="dropdown" aria-expanded="false">
                             Топ
@@ -247,7 +248,6 @@
                     <button class="btn filter-btn" data-filter="favorite">⭐ Избранное</button>
                     <button class="btn filter-btn" data-filter="created">👤 Созданные мной</button>
                     <button class="btn filter-btn" data-filter="selected">💬 Начатые</button>
-                    <button class="btn filter-btn" data-filter="imported">🔗 Импортированные</button>
                 </div>
             </div>
         </div>
@@ -383,16 +383,6 @@
             searchInput.placeholder = placeholders[currentIndex];
         }, 3000);
 
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const isCategoryBtn = this.hasAttribute('data-category');
-                const selector = isCategoryBtn ? '[data-category]' : '[data-filter]';
-                
-                document.querySelectorAll(selector).forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
         function updateYear() {
             const yearElements = document.querySelectorAll('.offcanvas-footer p');
             if (yearElements.length > 0) {
@@ -401,6 +391,40 @@
             }
         }
         updateYear();
+
+        function showCapybara(event) {
+            event.preventDefault();
+            const capyImages = [
+                'https://testapi.capyhub.su/photo/capy/1.jpg',
+                'https://testapi.capyhub.su/photo/capy/2.jpeg',
+                'https://testapi.capyhub.su/photo/capy/3.jpeg',
+                'https://testapi.capyhub.su/photo/capy/4.jpeg',
+                'https://testapi.capyhub.su/photo/capy/5.jpeg',
+                'https://testapi.capyhub.su/photo/capy/6.webp'
+            ];
+            const randomCapy = capyImages[Math.floor(Math.random() * capyImages.length)];
+            
+            // Создаем модальное окно для показа капибары
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header border-secondary">
+                            <h5 class="modal-title">🦫 Капибара для хорошего настроения!</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="${randomCapy}" class="img-fluid rounded" alt="Капибара">
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+            modal.addEventListener('hidden.bs.modal', () => modal.remove());
+        }
     </script>
 
     <script src="/js/characters.js" defer></script>
