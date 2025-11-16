@@ -843,7 +843,7 @@ class UI {
         charactersSection.appendChild(charactersHeader);
 
         const createCard = this.createElement('div', { 
-            className: 'card border-0 bg-secondary bg-opacity-10'
+            className: 'card border-0 bg-light'
         });
         const createCardBody = this.createElement('div', {
             className: 'card-body text-center py-4'
@@ -854,7 +854,7 @@ class UI {
         }));
         createCardBody.appendChild(this.createElement('div', {
             text: 'Максимум персонажей',
-            className: 'text-muted fw-medium'
+            className: 'text-dark fw-medium'
         }));
         createCard.appendChild(createCardBody);
         charactersSection.appendChild(createCard);
