@@ -101,6 +101,14 @@ class ApiService {
             }
         });
     }
+
+    fetchSubsData(){
+        return this.request(`/v1/profile/`, {
+            headers: { 
+                'Cache-Control': 'no-cache'
+            }
+        });
+    }
 }
 
 class ImageLoader {
@@ -210,6 +218,7 @@ class UI {
         this.dom = {
             cardsContainer: document.querySelector('.cards-container'),
             cardsRow: document.querySelector('.cards-container .row'),
+            navLinksContainer: document.getElementById('navItem'),
             tags: {
                 modalContainer: document.getElementById('tags-modal-container'),
             },
@@ -585,6 +594,310 @@ class UI {
             modal.dislikeBtn.classList.add('btn-outline-danger');
         }
     }
+
+    showInProgressMessage(pageName, backCallback) {
+        this.clearContainer(this.dom.cardsRow);
+        
+        this.paginationWrapper?.remove();
+        this.paginationWrapper = null;
+        
+        const col = this.createElement('div', { className: 'col-12 text-center py-5' });
+        const backBtn = this.createElement('button', {
+            className: 'btn btn-primary mt-4',
+            text: '🏠 Вернуться на главную'
+        });
+        backBtn.addEventListener('click', backCallback);
+
+        col.append(
+            this.createElement('div', { text: '🚧', styles: { fontSize: '72px', marginBottom: '20px' } }),
+            this.createElement('h4', { text: `Страница "${pageName}" в разработке`, styles: { marginBottom: '15px' } }),
+            this.createElement('p', { 
+                className: 'lead text-muted',
+                text: 'Мы усердно работаем, чтобы сделать эту функцию доступной как можно скорее!', 
+                styles: { maxWidth: '500px', margin: '0 auto' } 
+            }),
+            backBtn
+        );
+
+        this.dom.cardsRow.appendChild(col);
+    }
+
+    updateNavLinks(activeLink) {
+        this.dom.navLinksContainer.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        if (activeLink) {
+            activeLink.classList.add('active');
+        } else {
+            const homeLink = Array.from(this.dom.navLinksContainer.querySelectorAll('.nav-link'))
+                                .find(l => l.textContent.includes('Главная'));
+            if (homeLink) homeLink.classList.add('active');
+        }
+    }
+
+    renderProfile(profileData, userData) {
+        this.clearContainer(this.dom.cardsRow);
+        
+        this.paginationWrapper?.remove();
+        this.paginationWrapper = null;
+        
+        const col = this.createElement('div', { className: 'col-12' });
+        const container = this.createElement('div', { className: 'container py-4' });
+        
+        // Основная карточка профиля
+        const profileCard = this.createElement('div', { 
+            className: 'card border-0 shadow-lg'
+        });
+        
+        // Шапка с градиентом и информацией о пользователе
+        const cardHeader = this.createElement('div', { 
+            className: 'card-header border-0 text-white',
+            styles: {
+                background: profileData.is_premium 
+                    ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' 
+                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                padding: '2rem'
+            }
+        });
+        
+        const userInfoWrapper = this.createElement('div', { 
+            className: 'd-flex align-items-center gap-3'
+        });
+        
+        // Аватар
+        let avatarElement;
+        if (userData.photo_url) {
+            avatarElement = this.createElement('img', {
+                className: 'rounded-circle',
+                attributes: {
+                    src: userData.photo_url,
+                    alt: 'Avatar',
+                    width: '80',
+                    height: '80'
+                },
+                styles: {
+                    objectFit: 'cover',
+                    border: '3px solid rgba(255,255,255,0.3)'
+                }
+            });
+        } else {
+            avatarElement = this.createElement('div', {
+                className: 'rounded-circle d-flex align-items-center justify-content-center',
+                text: (userData.first_name?.[0] || '?').toUpperCase(),
+                styles: {
+                    width: '80px',
+                    height: '80px',
+                    fontSize: '32px',
+                    backgroundColor: 'rgba(255,255,255,0.2)',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    border: '3px solid rgba(255,255,255,0.3)'
+                }
+            });
+        }
+        
+        const userInfo = this.createElement('div', { className: 'flex-grow-1' });
+        const fullName = [userData.first_name, userData.last_name].filter(Boolean).join(' ') || 'Пользователь';
+        
+        userInfo.appendChild(this.createElement('h4', { 
+            text: fullName, 
+            className: 'mb-1 fw-bold'
+        }));
+        
+        if (userData.username) {
+            userInfo.appendChild(this.createElement('p', { 
+                text: `@${userData.username}`, 
+                className: 'mb-0 opacity-75'
+            }));
+        }
+        
+        userInfo.appendChild(this.createElement('small', {
+            text: `ID: ${profileData.user_id}`,
+            className: 'opacity-50'
+        }));
+        
+        userInfoWrapper.append(avatarElement, userInfo);
+        cardHeader.appendChild(userInfoWrapper);
+        
+        // Тело карточки
+        const cardBody = this.createElement('div', { 
+            className: 'card-body',
+            styles: { padding: '1.5rem' }
+        });
+        
+        // Блок подписки
+        const subscriptionSection = this.createElement('div', { className: 'mb-3' });
+        
+        const subscriptionHeader = this.createElement('div', { 
+            className: 'd-flex align-items-center justify-content-between mb-2'
+        });
+        
+        subscriptionHeader.appendChild(this.createElement('div', {
+            className: 'd-flex align-items-center gap-2'
+        }));
+        
+        subscriptionHeader.firstChild.appendChild(this.createElement('span', {
+            text: '💎',
+            styles: { fontSize: '1.2rem' }
+        }));
+        
+        subscriptionHeader.firstChild.appendChild(this.createElement('h6', { 
+            text: 'Подписка', 
+            className: 'mb-0'
+        }));
+        
+        const tariffBadge = this.createElement('span', {
+            className: `badge ${profileData.is_premium ? 'bg-warning' : 'bg-secondary'}`,
+            text: profileData.tariff_name || 'Базовый'
+        });
+        
+        subscriptionHeader.appendChild(tariffBadge);
+        subscriptionSection.appendChild(subscriptionHeader);
+        
+        if (profileData.subscription_end_date) {
+            const endDate = new Date(profileData.subscription_end_date).toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            subscriptionSection.appendChild(this.createElement('p', {
+                text: `Активна до: ${endDate}`,
+                className: 'text-muted mb-0 small'
+            }));
+        }
+        
+        subscriptionSection.appendChild(this.createElement('hr', { className: 'my-3' }));
+        
+        // Блок использования запросов
+        const requestsSection = this.createElement('div', { className: 'mb-3' });
+        
+        const requestsHeader = this.createElement('div', { 
+            className: 'd-flex align-items-center gap-2 mb-2'
+        });
+        
+        requestsHeader.appendChild(this.createElement('span', {
+            text: '📊',
+            styles: { fontSize: '1.2rem' }
+        }));
+        
+        requestsHeader.appendChild(this.createElement('h6', { 
+            text: 'Использование запросов', 
+            className: 'mb-0'
+        }));
+        
+        requestsSection.appendChild(requestsHeader);
+        
+        const requestsLabel = this.createElement('div', {
+            className: 'd-flex justify-content-between mb-2 small'
+        });
+        
+        requestsLabel.appendChild(this.createElement('span', {
+            text: 'Запросы сегодня',
+            className: 'text-muted'
+        }));
+        
+        requestsLabel.appendChild(this.createElement('span', {
+            text: `${profileData.requests_used_today} / ${profileData.daily_requests_limit}`,
+            className: 'fw-semibold'
+        }));
+        
+        requestsSection.appendChild(requestsLabel);
+        
+        const progressBar = this.createElement('div', { 
+            className: 'progress mb-2',
+            styles: { height: '8px' }
+        });
+        
+        const progressValue = Math.min((profileData.requests_used_today / profileData.daily_requests_limit) * 100, 100);
+        const progressFill = this.createElement('div', {
+            className: `progress-bar ${progressValue >= 90 ? 'bg-danger' : progressValue >= 70 ? 'bg-warning' : 'bg-success'}`,
+            attributes: {
+                role: 'progressbar',
+                'aria-valuenow': progressValue,
+                'aria-valuemin': '0',
+                'aria-valuemax': '100'
+            },
+            styles: { width: `${progressValue}%` }
+        });
+        
+        progressBar.appendChild(progressFill);
+        requestsSection.appendChild(progressBar);
+        
+        const remainingText = this.createElement('div', {
+            className: 'alert alert-info py-2 px-3 mb-0 small',
+            text: `Осталось запросов: ${profileData.requests_remaining_today}`
+        });
+        
+        requestsSection.appendChild(remainingText);
+        requestsSection.appendChild(this.createElement('hr', { className: 'my-3' }));
+        
+        // Блок лимитов персонажей
+        const charactersSection = this.createElement('div');
+
+        const charactersHeader = this.createElement('div', { 
+            className: 'd-flex align-items-center gap-2 mb-3'
+        });
+
+        charactersHeader.appendChild(this.createElement('span', {
+            text: '👥',
+            styles: { fontSize: '1.2rem' }
+        }));
+
+        charactersHeader.appendChild(this.createElement('h6', { 
+            text: 'Лимиты персонажей', 
+            className: 'mb-0'
+        }));
+
+        charactersSection.appendChild(charactersHeader);
+
+        const charactersRow = this.createElement('div', { className: 'row g-3' });
+
+        // Создание персонажей
+        const createCol = this.createElement('div', { className: 'col-6' });
+        const createCard = this.createElement('div', { 
+            className: 'card border-0 h-100'
+        });
+        const createCardBody = this.createElement('div', {
+            className: 'card-body text-center py-4'
+        });
+        createCardBody.appendChild(this.createElement('div', {
+            text: profileData.max_characters_create,
+            className: 'display-4 fw-bold text-primary mb-2'
+        }));
+        createCardBody.appendChild(this.createElement('div', {
+            text: 'Создание',
+            className: 'text-muted fw-medium'
+        }));
+        createCard.appendChild(createCardBody);
+        createCol.appendChild(createCard);
+
+        // Добавление персонажей
+        const addCol = this.createElement('div', { className: 'col-6' });
+        const addCard = this.createElement('div', { 
+            className: 'card border-0 h-100'
+        });
+        const addCardBody = this.createElement('div', {
+            className: 'card-body text-center py-4'
+        });
+        addCardBody.appendChild(this.createElement('div', {
+            text: profileData.max_characters_add,
+            className: 'display-4 fw-bold text-success mb-2'
+        }));
+        addCardBody.appendChild(this.createElement('div', {
+            text: 'Добавление',
+            className: 'text-muted fw-medium'
+        }));
+        addCard.appendChild(addCardBody);
+        addCol.appendChild(addCard);
+
+        charactersRow.append(createCol, addCol);
+        charactersSection.appendChild(charactersRow);
+        
+        cardBody.append(subscriptionSection, requestsSection, charactersSection);
+        profileCard.append(cardHeader, cardBody);
+        container.appendChild(profileCard);
+        col.appendChild(container);
+        
+        this.dom.cardsRow.appendChild(col);
+    }
 }
 
 class App {
@@ -649,6 +962,10 @@ class App {
         if (this.ui.dom.characterModal.favoriteBtn) {
             this.ui.dom.characterModal.favoriteBtn.addEventListener('click', this.handleFavoriteClick.bind(this));
         }
+
+        if (this.ui.dom.navLinksContainer) {
+            this.ui.dom.navLinksContainer.addEventListener('click', this.handleNavClick.bind(this));
+        }
     }
 
     async loadCharacters() {
@@ -701,6 +1018,7 @@ class App {
         this.state.currentFilter = event.currentTarget.dataset.filter;
         this.state.selectedTags = [];
         this.state.currentPage = 1;
+        this.ui.updateNavLinks(null);
 
         this.ui.updateFilterButtons(this.state.currentFilter);
         this.ui.updateTagsUI(this.state.selectedTags);
@@ -731,6 +1049,7 @@ class App {
         }
 
         this.state.currentPage = 1;
+        this.ui.updateNavLinks(null);
         this.ui.updateTagsUI(this.state.selectedTags);
         this.loadCharacters();
     }
@@ -780,6 +1099,7 @@ class App {
         this.ui.dom.searchInput.classList.remove('is-invalid');
         this.state.currentSearchQuery = validQuery || '';
         this.state.currentPage = 1;
+        this.ui.updateNavLinks(null);
         this.loadCharacters();
     }
 
@@ -811,6 +1131,7 @@ class App {
         this.state.selectedTags = [];
         this.state.currentSearchQuery = '';
         this.state.currentPage = 1;
+        this.ui.updateNavLinks(null);
 
         this.ui.updateFilterButtons(this.state.currentFilter);
         this.ui.resetSearchUI();
@@ -928,6 +1249,77 @@ class App {
             console.error('Ошибка при добавлении/удалении из избранного:', error);
             window.Telegram.WebApp.showAlert('Не удалось изменить статус избранного');
         }
+    }
+
+    handleNavClick(event) {
+        const link = event.target.closest('a.nav-link');
+        if (!link) return;
+
+        event.preventDefault();
+
+        if (this.ui.dom.offcanvasFilters) {
+            const offcanvas = bootstrap.Offcanvas.getInstance(this.ui.dom.offcanvasFilters);
+            offcanvas?.hide();
+        }
+
+        const linkText = link.textContent.trim();
+
+        switch (linkText) {
+            case '🏠 Главная':
+                this.handleHomeClick(link);
+                break;
+            
+            case '✨ Создать персонажа':
+                this.handleCreateCharacterClick(link);
+                break;
+
+            case '👤 Профиль':
+                this.handleProfileClick(link);
+                break;
+
+            case '💎 Тарифы':
+                this.handleTariffsClick(link);
+                break;
+        }
+    }
+
+    handleHomeClick(link) {
+        this.ui.updateNavLinks(link);
+        this.resetAndLoad();
+    }
+
+    handleCreateCharacterClick(link) {
+        this.ui.updateNavLinks(link);
+        this.ui.showInProgressMessage('Создать персонажа', this.resetAndLoad.bind(this));
+    }
+
+    async handleProfileClick(link) {
+        this.ui.updateNavLinks(link);
+        this.ui.showLoadingSpinner(true);
+        
+        try {
+            const tgUser = window.Telegram.WebApp.initDataUnsafe?.user || {};
+            const userData = {
+                user_id: tgUser.id,
+                first_name: tgUser.first_name,
+                last_name: tgUser.last_name,
+                username: tgUser.username,
+                photo_url: tgUser.photo_url
+            };
+            
+            const profileData = await this.api.fetchSubsData();
+            this.ui.renderProfile(profileData, userData);
+        } catch (error) {
+            console.error('Ошибка загрузки профиля:', error);
+            this.ui.showCharactersError(() => this.handleProfileClick(link));
+        } finally {
+            this.ui.showLoadingSpinner(false);
+        }
+    }
+
+    handleTariffsClick(link) {
+        this.ui.updateNavLinks(link);
+        this.ui.showInProgressMessage('Тарифы', this.resetAndLoad.bind(this));
     }
 }
 
