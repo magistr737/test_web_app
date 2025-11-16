@@ -12,13 +12,7 @@ class ApiService {
             ...options.headers,
         };
 
-        const finalOptions = {
-            ...options,
-            headers,
-            cache: 'no-store'
-        };
-
-        const response = await fetch(url, finalOptions);
+        const response = await fetch(url, { ...options, headers });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -26,7 +20,9 @@ class ApiService {
     }
 
     fetchTags() {
-        return this.request('/v1/characters/tags');
+        return this.request('/v1/characters/tags', {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
     }
 
     fetchCharacters(filter, page, pageSize, tags, searchQuery) {
@@ -41,7 +37,9 @@ class ApiService {
         if (searchQuery) {
             params.append('search_query', searchQuery);
         }
-        return this.request(`/v1/characters/list?${params.toString()}`);
+        return this.request(`/v1/characters/list?${params.toString()}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
     }
 
     fetchPhoto(fileId) {
@@ -49,22 +47,29 @@ class ApiService {
     }
 
     fetchCharacterDetail(publicId) {
-        return this.request(`/v1/characters/${publicId}`);
+        return this.request(`/v1/characters/${publicId}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
     }
 
     fetchCharacterStats(publicId) {
-        return this.request(`/v1/characters/stats?public_id=${publicId}`);
+        return this.request(`/v1/characters/stats?public_id=${publicId}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
     }
 
     fetchReactionStatus(publicId) {
-        return this.request(`/v1/characters/reactions/status/${publicId}`);
+        return this.request(`/v1/characters/reactions/status/${publicId}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
     }
 
     setLike(publicId) {
         return this.request('/v1/characters/reactions/like', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
             },
             body: JSON.stringify({ public_id: publicId })
         });
@@ -73,28 +78,36 @@ class ApiService {
     setDislike(publicId) {
         return this.request('/v1/characters/reactions/dislike', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
             },
             body: JSON.stringify({ public_id: publicId })
         });
     }
 
     fetchLikesCount(publicId) {
-        return this.request(`/v1/characters/reactions/count/${publicId}`);
+        return this.request(`/v1/characters/reactions/count/${publicId}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
     }
 
     toggleFavorite(publicId) {
         return this.request(`/v1/characters/favorite/${publicId}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
             }
         });
     }
 
     fetchSubsData(){
-        return this.request(`/v1/profile/`);
+        return this.request(`/v1/profile/`, {
+            headers: { 
+                'Cache-Control': 'no-cache'
+            }
+        });
     }
 }
 
@@ -624,7 +637,6 @@ class UI {
         this.paginationWrapper = null;
         
         const col = this.createElement('div', { className: 'col-12' });
-        const container = this.createElement('div', { className: 'container py-4' });
         
         const profileCard = this.createElement('div', { 
             className: 'card border-0 shadow-lg'
@@ -703,25 +715,28 @@ class UI {
             styles: { padding: '1.5rem' }
         });
         
+        // Секция подписки
         const subscriptionSection = this.createElement('div', { className: 'mb-3' });
         
         const subscriptionHeader = this.createElement('div', { 
             className: 'd-flex align-items-center justify-content-between mb-2'
         });
         
-        subscriptionHeader.appendChild(this.createElement('div', {
+        const subscriptionTitleWrapper = this.createElement('div', {
             className: 'd-flex align-items-center gap-2'
-        }));
+        });
         
-        subscriptionHeader.firstChild.appendChild(this.createElement('span', {
+        subscriptionTitleWrapper.appendChild(this.createElement('span', {
             text: '💎',
             styles: { fontSize: '1.2rem' }
         }));
         
-        subscriptionHeader.firstChild.appendChild(this.createElement('h6', { 
+        subscriptionTitleWrapper.appendChild(this.createElement('h6', { 
             text: 'Подписка', 
             className: 'mb-0'
         }));
+        
+        subscriptionHeader.appendChild(subscriptionTitleWrapper);
         
         const tariffBadge = this.createElement('span', {
             className: `badge ${profileData.is_premium ? 'bg-warning' : 'bg-secondary'}`,
@@ -745,6 +760,7 @@ class UI {
         
         subscriptionSection.appendChild(this.createElement('hr', { className: 'my-3' }));
         
+        // Секция запросов
         const requestsSection = this.createElement('div', { className: 'mb-3' });
         
         const requestsHeader = this.createElement('div', { 
@@ -807,6 +823,7 @@ class UI {
         requestsSection.appendChild(remainingText);
         requestsSection.appendChild(this.createElement('hr', { className: 'my-3' }));
         
+        // Секция персонажей (только создание)
         const charactersSection = this.createElement('div');
 
         const charactersHeader = this.createElement('div', { 
@@ -819,17 +836,14 @@ class UI {
         }));
 
         charactersHeader.appendChild(this.createElement('h6', { 
-            text: 'Лимиты персонажей', 
+            text: 'Лимит создания персонажей', 
             className: 'mb-0'
         }));
 
         charactersSection.appendChild(charactersHeader);
 
-        const charactersRow = this.createElement('div', { className: 'row g-3' });
-
-        const createCol = this.createElement('div', { className: 'col-6' });
         const createCard = this.createElement('div', { 
-            className: 'card border-0 h-100'
+            className: 'card border-0 bg-light'
         });
         const createCardBody = this.createElement('div', {
             className: 'card-body text-center py-4'
@@ -839,37 +853,15 @@ class UI {
             className: 'display-4 fw-bold text-primary mb-2'
         }));
         createCardBody.appendChild(this.createElement('div', {
-            text: 'Создание',
+            text: 'Максимум персонажей',
             className: 'text-muted fw-medium'
         }));
         createCard.appendChild(createCardBody);
-        createCol.appendChild(createCard);
-
-        const addCol = this.createElement('div', { className: 'col-6' });
-        const addCard = this.createElement('div', { 
-            className: 'card border-0 h-100'
-        });
-        const addCardBody = this.createElement('div', {
-            className: 'card-body text-center py-4'
-        });
-        addCardBody.appendChild(this.createElement('div', {
-            text: profileData.max_characters_add,
-            className: 'display-4 fw-bold text-success mb-2'
-        }));
-        addCardBody.appendChild(this.createElement('div', {
-            text: 'Добавление',
-            className: 'text-muted fw-medium'
-        }));
-        addCard.appendChild(addCardBody);
-        addCol.appendChild(addCard);
-
-        charactersRow.append(createCol, addCol);
-        charactersSection.appendChild(charactersRow);
+        charactersSection.appendChild(createCard);
         
         cardBody.append(subscriptionSection, requestsSection, charactersSection);
         profileCard.append(cardHeader, cardBody);
-        container.appendChild(profileCard);
-        col.appendChild(container);
+        col.appendChild(profileCard);
         
         this.dom.cardsRow.appendChild(col);
     }
