@@ -166,18 +166,18 @@
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body d-flex flex-column">
-                    <ul class="navbar-nav justify-content-end pe-3">
+                    <ul class="navbar-nav justify-content-end pe-3" id="navItem">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">🏠 Главная</a>
+                            <a class="nav-link active" aria-current="page" href="#" data-bs-dismiss="offcanvas">🏠 Главная</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">✨ Создать персонажа</a>
+                            <a class="nav-link" href="#" data-bs-dismiss="offcanvas">✨ Создать персонажа</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">👤 Профиль</a>
+                            <a class="nav-link" href="#" data-bs-dismiss="offcanvas">👤 Профиль</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">💎 Тарифы</a>
+                            <a class="nav-link" href="#" data-bs-dismiss="offcanvas">💎 Тарифы</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" onclick="showCapybara(event)">🦫 Капибара</a>
@@ -404,14 +404,13 @@
             ];
             const randomCapy = capyImages[Math.floor(Math.random() * capyImages.length)];
             
-            // Создаем модальное окно для показа капибары
             const modal = document.createElement('div');
             modal.className = 'modal fade';
             modal.innerHTML = `
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content bg-dark">
                         <div class="modal-header border-secondary">
-                            <h5 class="modal-title">🦫 Капибара для хорошего настроения!</h5>
+                            <h5 class="modal-title">🦫 Капибарки, нажми ещё раз - будет новая рандомная капибарка :)</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body text-center">
